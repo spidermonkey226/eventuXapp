@@ -1,0 +1,27 @@
+<header>
+    <nav class="container">
+        <div class="navbar-logo">
+            <a routerLink="/home">
+                <img class="logo" src="assets/eventuxLogo-removebg.png" alt="JetJoy Logo">
+            </a>
+        </div>
+        
+        <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#product">About Us</a></li>
+            <li><a href="#testimonials">Our customer</a></li>
+            <li><a href="#cta">Your Event</a></li>
+            
+        </ul>
+        <div>
+            <button [routerLink]="['/signin']">Sign In</button>
+            <button [routerLink]="['/signup']">Sign Up</button>
+        </div>
+        
+    </nav>
+</header>
+
+<router-outlet></router-outlet>
+
+
+    

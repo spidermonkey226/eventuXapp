@@ -1,0 +1,24 @@
+
+<nav class="navbar">
+    <div class="navbar-container">
+      <!-- Logo on the Left -->
+      <div class="navbar-logo">
+        <a routerLink="/home">
+          <img src="assets/eventuxLogo-removebg.png" alt="JetJoy Logo">
+        </a>
+      </div>
+  
+      <!-- Navigation Links Centered -->
+      <ul class="navbar-links">
+        <li><a routerLink="/home" routerLinkActive="active" class="nav-link">Home</a></li>
+        <li><a routerLink="/catalog" routerLinkActive="active" class="nav-link">Catalog</a></li>
+        <li><a routerLink="/about" routerLinkActive="active" class="nav-link">About Us</a></li>
+        <li><a routerLink="/cart" routerLinkActive="active" class="nav-link">Cart</a></li>
+        <li><a routerLink="/signin" routerLinkActive="active" class="nav-link">Login</a></li>
+      </ul>
+    </div>
+  </nav>
+  
+  <!-- Angular Router Outlet -->
+  <router-outlet></router-outlet>
+  
