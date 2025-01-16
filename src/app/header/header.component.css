@@ -39,7 +39,7 @@ nav {
     display: flex;
     list-style: none;
     position: absolute;
-    left: 60%; /* Center horizontally */
+    left: 56%; /* Center horizontally */
 
 }
 .nav-links ul {
