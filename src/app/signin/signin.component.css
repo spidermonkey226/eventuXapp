@@ -89,3 +89,20 @@ label a{
     color: #000000;
     text-decoration: none;
 }                                          
+.alert {
+  padding: 10px;
+  margin-bottom: 10px;
+  font-weight: bold;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.alert-success {
+  color: #155724;
+  background-color: #d4edda;
+}
+
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+}

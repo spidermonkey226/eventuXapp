@@ -4,6 +4,7 @@ import { SigninComponent } from './signin/signin.component';
 import { SignupComponent } from './signup/signup.component';
 import { PageNotFoundComponent } from './page-not-found/page-not-found.component';
 import { AddEventComponent } from './add-event/add-event.component';
+import { ProfileComponent } from './profile/profile.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -11,6 +12,7 @@ export const routes: Routes = [
     { path: 'signin', component: SigninComponent},
     { path: 'signup', component: SignupComponent},
     { path: 'addevent', component: AddEventComponent},
+    { path: 'profile', component: ProfileComponent},
     { path: '**', component: PageNotFoundComponent },
 ];
 

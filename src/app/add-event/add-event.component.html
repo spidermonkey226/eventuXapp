@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
 <body>
-  <form action="#">
+  <form action="#" #eventForm="ngForm">
     <!--  General -->
     <div class="form-group">
       <h2 class="heading">Add your Event</h2>
@@ -66,7 +66,46 @@
       <div class="controls">
         <i class='bx bx-male-female'></i>
         <input type="text" class="input" placeholder="People" required>
-      </div>    
+      </div>   
+        <!-- Event Category -->
+  <div class="form-group">
+    <h2 class="heading">Event Category</h2>
+    <div class="controls">
+      <i class='bx bx-category'></i>
+      <select class="input" required [(ngModel)]="eventCategory" name="eventCategory">
+        <option value="" disabled selected>Select a category</option>
+        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+      </select>
+    </div>
+  </div>
+   <!-- Manager Question -->
+  <div class="form-group">
+    <h2 class="heading">Event Manager</h2>
+    <div class="controls">
+      <label>
+        <input type="checkbox" [(ngModel)]="hasManager" name="hasManager"> 
+        Is there a manager for this event?
+      </label>
+    </div>
+
+    <!-- Conditionally show manager fields -->
+    <div *ngIf="hasManager">
+      <div class="controls">
+        <i class="bx bx-user"></i>
+        <input type="text" class="input" placeholder="Manager Name" [(ngModel)]="manager.name" name="managerName" required>
+      </div>
+      <div class="controls">
+        <i class='bx bx-envelope'></i>
+        <input type="email" class="input" placeholder="Manager Email" [(ngModel)]="manager.email" name="managerEmail" required>
+      </div>
+      <div class="controls">
+        <i class='bx bx-phone'></i>
+        <input type="tel" class="input" placeholder="Manager Phone" [(ngModel)]="manager.phone" name="managerPhone" required>
+      </div>
+    </div>
+  </div>
+
+       
       <p class="info-text">Please describe your needs e.g. children's chair</p>  
       <div class="grid">
         

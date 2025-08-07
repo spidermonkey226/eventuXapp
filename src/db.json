@@ -1,0 +1,43 @@
+{
+    "events": [
+    {
+      "id": 1,
+      "name": "Wedding Party",
+      "email": "bride@example.com",
+      "phone": "0501234567",
+      "street": "Rothschild",
+      "streetNumber": "12",
+      "postCode": "65252",
+      "city": "Tel Aviv",
+      "date": "2025-06-01",
+      "people": 150,
+      "comments": "Outdoor ceremony"
+    },
+    {
+      "id": 2,
+      "name": "Business Conference",
+      "email": "manager@example.com",
+      "phone": "0523456789",
+      "street": "Begin Blvd",
+      "streetNumber": "100",
+      "postCode": "67890",
+      "city": "Haifa",
+      "date": "2025-07-10",
+      "people": 300,
+      "comments": "Need projector and microphone"
+    }
+  ],
+
+  "users": [
+    {
+      "id": "0",
+      "fname": "Alaa",
+      "lname": "Dabour",
+      "phone":"0542115671",
+      "email": "alaa@gmail.com",
+      "date": "",
+      "password": "alaa123",
+      "permission":"appadmin"
+    }
+  ]
+}
