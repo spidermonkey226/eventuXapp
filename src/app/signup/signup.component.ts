@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { User } from '../class/user';
+import { Router } from '@angular/router';
 import { UserService } from '../services/user.service';
 
 @Component({
@@ -12,28 +12,34 @@ import { UserService } from '../services/user.service';
   styleUrls: ['./signup.component.css']
 })
 export class SignupComponent {
-  user: User = new User(0, '', '', '', '', '', {
-    id: 4, // Match DB ID for 'regularuser'
-    permisionName: 'regularuser',
-    role: 'ROLE_USER',
-    name: 'Regular User'
-  }, new Date());
+  // Keep a simple form model; backend assigns ROLE_USER
+  form = {
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: ''
+  };
 
-  constructor(private userService: UserService) {}
+  submitting = false;
+
+  constructor(private userService: UserService, private router: Router) {}
 
   onSubmit(): void {
-    this.user.date = new Date();
-    this.userService.createUser(this.user).subscribe((res: any) => {
-      alert(res);
-      if (res === 'Registration successful!') {
-        this.user = new User(0, '', '', '', '', '', {
-          id: 4,
-          permisionName: 'regularuser',
-          role: 'ROLE_USER',
-          name: 'Regular User'
-        }, new Date());
-      }
-    });
+    if (this.submitting) return;
+    this.submitting = true;
+
+    // POST /api/auth/signup — backend hashes password & sets ROLE_USER
+    this.userService.createUser(this.form).subscribe({
+    next: (res) => {
+      alert(res?.message || 'Registration successful!');
+      this.router.navigateByUrl('/'); // go home
+    },
+    error: (err) => {
+      console.error(err);
+      alert(err?.error?.message || err?.error || 'Registration failed');
+      this.submitting = false;
+    }
+  });
   }
 }
-

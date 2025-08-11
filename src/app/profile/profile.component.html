@@ -1,45 +1,85 @@
-<div class="profile-top">
-  <p>profile is working</p>
-</div>
-
-<!-- Debug -->
-<p style="color: red; font-size: 24px;">🔴 Profile Component Loaded</p>
-
-<!-- Only show the form when user is loaded -->
-<div class="profile-container" *ngIf="user as u">
-  <div class="profile-card">
-    <div class="profile-image">
-      <img [src]="profileImageUrl || defaultImage" alt="Profile Image" />
-      <input type="file" (change)="onImageSelected($event)" />
+<div class="profile-page">
+  <!-- LEFT: avatar + email + edit -->
+  <aside class="left-panel card">
+    <div class="avatar-wrap">
+      <img [src]="profileImageUrl || defaultImage" alt="Profile Image" class="avatar" />
+      <label class="upload-btn" *ngIf="editMode">
+        Change photo
+        <input type="file" (change)="onImageSelected($event)" hidden />
+      </label>
     </div>
 
-    <form (ngSubmit)="updateUser()" #form="ngForm">
-      <div class="form-group">
-        <label>First Name</label>
-        <input [(ngModel)]="u.firstName" name="fname" required />
-      </div>
-      <div class="form-group">
-        <label>Last Name</label>
-        <input [(ngModel)]="u.lastName" name="lname" required />
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" [(ngModel)]="u.email" name="email" required />
-      </div>
-      <div class="form-group">
-        <label>Phone</label>
-        <input [(ngModel)]="u.phone" name="phone" required />
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" [(ngModel)]="u.password" name="password" required />
-      </div>
-      <div class="form-group">
-        <label>Permission</label>
-        <input [value]="u.permission" disabled />
-      </div>
+    <div class="identity">
+      <h2 class="name">{{ user?.firstName }} {{ user?.lastName }}</h2>
+      <p class="email">{{ user?.email }}</p>
+    </div>
 
-      <button type="submit">Update Profile</button>
+    <div class="actions">
+      <button *ngIf="!editMode" (click)="startEdit()" class="btn primary">Edit Profile</button>
+      <div *ngIf="editMode" class="edit-actions">
+        <button (click)="save()" class="btn primary">Save</button>
+        <button (click)="cancel()" class="btn ghost">Cancel</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- RIGHT: details / form -->
+  <section class="right-panel card" *ngIf="user as u">
+    <h3 class="section-title">Bio Graph</h3>
+
+    <!-- READ-ONLY VIEW -->
+    <div *ngIf="!editMode" class="details-grid">
+      <div class="row"><span class="label">First Name</span><span class="value">{{ u.firstName }}</span></div>
+      <div class="row"><span class="label">Last Name</span><span class="value">{{ u.lastName }}</span></div>
+      <div class="row"><span class="label">Email</span><span class="value">{{ u.email }}</span></div>
+      <div class="row"><span class="label">Phone</span><span class="value">{{ u.phone }}</span></div>
+      <div class="row"><span class="label">Permission</span><span class="value">{{ u.permision?.permisionName || '—' }}</span></div>
+    </div>
+
+    <!-- EDIT MODE -->
+    <form *ngIf="editMode" (ngSubmit)="save()" class="form-grid" #form="ngForm">
+      <label class="field">
+        <span>First Name</span>
+        <input [(ngModel)]="formModel.firstName" name="firstName" required />
+      </label>
+
+      <label class="field">
+        <span>Last Name</span>
+        <input [(ngModel)]="formModel.lastName" name="lastName" required />
+      </label>
+
+      <label class="field">
+        <span>Email</span>
+        <input type="email" [(ngModel)]="formModel.email" name="email" required />
+      </label>
+
+      <label class="field">
+        <span>Phone</span>
+        <input [(ngModel)]="formModel.phone" name="phone" />
+      </label>
+
+      <label class="field readonly">
+        <span>Permission</span>
+        <input [value]="user?.permision?.permisionName || '—'" disabled />
+      </label>
+
+      <div class="divider"></div>
+
+      <!-- Password only in edit mode -->
+      <label class="field">
+        <span>New Password</span>
+        <input type="password" [(ngModel)]="formModel.newPassword" name="newPassword" minlength="6" />
+      </label>
+
+      <label class="field">
+        <span>Confirm New Password</span>
+        <input type="password" [(ngModel)]="formModel.confirmPassword" name="confirmPassword" minlength="6" />
+      </label>
+
+      <div class="form-actions">
+        <button type="submit" class="btn primary">Save</button>
+        <button type="button" class="btn ghost" (click)="cancel()">Cancel</button>
+      </div>
     </form>
-  </div>
+  </section>
 </div>

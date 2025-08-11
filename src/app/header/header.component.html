@@ -1,34 +1,32 @@
 <header>
-    <nav class="container">
-        <div class="navbar-logo">
-            <a routerLink="/home">
-                <img class="logo" src="assets/eventuxLogo-removebg.png" alt="JetJoy Logo">
-            </a>
-        </div>
-        
-        <ul class="nav-links">
-            <li><a href="#about-us">About Us</a></li>
-            <li><a href="#why-choose-us">Why Choose US</a></li>
-            <li><a href="#customer-reviews">Our customer</a></li>
-            <li><a href="#cta">Your Event</a></li>
-            <li ><a [routerLink]="['/profile']">profile</a></li>
-            
-        </ul>
-       <div>
-            <!-- Show when NOT logged in -->
-            <button *ngIf="!isLoggedIn" [routerLink]="['/signin']">Sign In</button>
-            <button *ngIf="!isLoggedIn" [routerLink]="['/signup']">Sign Up</button>
+  <nav class="container">
+    <div class="navbar-logo">
+      <a routerLink="/home">
+        <img class="logo" src="assets/eventuxLogo-removebg.png" alt="JetJoy Logo">
+      </a>
+    </div>
 
-            <!-- Show when logged in -->
-            <button *ngIf="isLoggedIn" [routerLink]="['/profile']">Profile</button>
-            <button *ngIf="isLoggedIn" (click)="logout()">Logout</button>
-        </div>
+    <ul class="nav-links">
+      <li><a href="#about-us">About Us</a></li>
+      <li><a href="#why-choose-us">Why Choose US</a></li>
+      <li><a href="#customer-reviews">Our customer</a></li>
+      <li><a [routerLink]="['/event-manager']">Your Event</a></li>
+    </ul>
 
-        
-    </nav>
+    <div>
+        <!-- NOT logged in -->
+        <ng-container *ngIf="!(isLoggedIn$ | async); else logged">
+        <button [routerLink]="['/signin']">Sign In</button>
+        <button [routerLink]="['/signup']">Sign Up</button>
+        </ng-container>
+
+        <!-- logged in -->
+        <ng-template #logged>
+        <button [routerLink]="['/profile']">Profile</button>
+        <button (click)="logout()">Logout</button>
+        </ng-template>
+    </div>
+  </nav>
 </header>
 
 <router-outlet></router-outlet>
-
-
-    

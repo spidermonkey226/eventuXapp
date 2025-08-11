@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { User } from '../class/user'; // ✅ Use the same User class
+import { User } from '../class/user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
   private apiUrl = 'http://localhost:8080/api/users';
-
+  private authUrl = 'http://localhost:8080/api/auth';
   constructor(private http: HttpClient) {}
 
   getUsers(): Observable<User[]> {
@@ -18,12 +18,31 @@ export class UserService {
   getUserById(id: number): Observable<User> {
     return this.http.get<User>(`${this.apiUrl}/${id}`);
   }
-
-  createUser(user: User): Observable<any> {
-    return this.http.post<any>(this.apiUrl, user);
+   getMe(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/me`);
   }
+  createUser(body: { firstName: string; lastName: string; email: string; phone: string; password: string }): Observable<any> {
+    return this.http.post<any>(`${this.authUrl}/signup`, body);
+  }
+  getAvatarBlob(id: number) {
+  return this.http.get(`${this.apiUrl}/${id}/avatar`, { responseType: 'blob' });
+}
 
-  updateUser(id: number, user: User): Observable<any> {
+uploadAvatar(id: number, file: File) {
+  const form = new FormData();
+  form.append('file', file);
+  return this.http.post(`${this.apiUrl}/${id}/avatar`, form);
+}
+getMyAvatarBlob() {
+  return this.http.get(`${this.apiUrl}/me/avatar`, { responseType: 'blob' });
+}
+
+uploadMyAvatar(file: File) {
+  const form = new FormData();
+  form.append('file', file);
+  return this.http.post(`${this.apiUrl}/me/avatar`, form);
+}
+  updateUser(id: number, user: Partial<User>): Observable<any> { 
     return this.http.put<any>(`${this.apiUrl}/${id}`, user);
   }
 }

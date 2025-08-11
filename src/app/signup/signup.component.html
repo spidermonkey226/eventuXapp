@@ -1,30 +1,64 @@
-<form (ngSubmit)="onSubmit()" #signupForm="ngForm">
-    <div class="box">
-      <div class="container">
-        <div class="top-header">
-          <header>Sign up</header>
-        </div>
-  
-        <div class="input-field">
-          <input type="text" class="input" placeholder="fname" required [(ngModel)]="user.firstName" name="fname">
-        </div>
-        <div class="input-field">
-          <input type="text" class="input" placeholder="lname" required [(ngModel)]="user.lastName" name="lname">
-        </div>
-        <div class="input-field">
-          <input type="text" class="input" placeholder="email" required [(ngModel)]="user.email" name="email">
-        </div>
-        <div class="input-field">
-          <input type="text" class="input" placeholder="phone" required [(ngModel)]="user.phone" name="phone">
-        </div>
-        <div class="input-field">
-          <input type="password" class="input" placeholder="Password" required [(ngModel)]="user.password" name="password">
-        </div>
-  
-        <div class="input-field">
-          <input type="submit" class="submit" value="submit">
-        </div>
+<form (ngSubmit)="onSubmit()" #signupForm="ngForm" novalidate>
+  <div class="box">
+    <div class="container">
+      <div class="top-header">
+        <header>Sign up</header>
+      </div>
+
+      <div class="input-field">
+        <input
+          class="input"
+          placeholder="First name"
+          required
+          name="firstName"
+          [(ngModel)]="form.firstName" />
+      </div>
+
+      <div class="input-field">
+        <input
+          class="input"
+          placeholder="Last name"
+          required
+          name="lastName"
+          [(ngModel)]="form.lastName" />
+      </div>
+
+      <div class="input-field">
+        <input
+          type="email"
+          class="input"
+          placeholder="Email"
+          required
+          name="email"
+          [(ngModel)]="form.email" />
+      </div>
+
+      <div class="input-field">
+        <input
+          class="input"
+          placeholder="Phone"
+          required
+          name="phone"
+          [(ngModel)]="form.phone" />
+      </div>
+
+      <div class="input-field">
+        <input
+          type="password"
+          class="input"
+          placeholder="Password"
+          required
+          name="password"
+          [(ngModel)]="form.password" />
+      </div>
+
+      <div class="input-field">
+        <input
+          type="submit"
+          class="submit"
+          value="Submit"
+          [disabled]="submitting || !signupForm.form.valid" />
       </div>
     </div>
-  </form>
-  
+  </div>
+</form>
