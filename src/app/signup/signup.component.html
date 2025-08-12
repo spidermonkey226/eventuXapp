@@ -1,55 +1,101 @@
-<form (ngSubmit)="onSubmit()" #signupForm="ngForm" novalidate>
+<div class="signup-bg">
+ <form #signupForm="ngForm" (ngSubmit)="onSubmit(signupForm)" novalidate>
   <div class="box">
     <div class="container">
       <div class="top-header">
         <header>Sign up</header>
       </div>
 
+      <!-- First Name -->
       <div class="input-field">
         <input
           class="input"
+          name="firstName"
           placeholder="First name"
           required
-          name="firstName"
-          [(ngModel)]="form.firstName" />
+          [pattern]="namePattern"
+          [(ngModel)]="form.firstName"
+          #firstName="ngModel" />
+        <small *ngIf="firstName.touched && firstName.invalid" style="color:#b00020">
+          <span *ngIf="firstName.errors?.['required']">First name is required.</span>
+          <span *ngIf="firstName.errors?.['pattern']">
+            Must start with uppercase and contain letters only (A–Z, a–z).
+          </span>
+        </small>
       </div>
 
+      <!-- Last Name -->
       <div class="input-field">
         <input
           class="input"
+          name="lastName"
           placeholder="Last name"
           required
-          name="lastName"
-          [(ngModel)]="form.lastName" />
+          [pattern]="namePattern"
+          [(ngModel)]="form.lastName"
+          #lastName="ngModel" />
+        <small *ngIf="lastName.touched && lastName.invalid" style="color:#b00020">
+          <span *ngIf="lastName.errors?.['required']">Last name is required.</span>
+          <span *ngIf="lastName.errors?.['pattern']">
+            Must start with uppercase and contain letters only (A–Z, a–z).
+          </span>
+        </small>
       </div>
 
+      <!-- Email -->
       <div class="input-field">
         <input
           type="email"
           class="input"
+          name="email"
           placeholder="Email"
           required
-          name="email"
-          [(ngModel)]="form.email" />
+          [pattern]="emailPattern"
+          [(ngModel)]="form.email"
+          #email="ngModel" />
+        <small *ngIf="email.touched && email.invalid" style="color:#b00020">
+          <span *ngIf="email.errors?.['required']">Email is required.</span>
+          <span *ngIf="email.errors?.['pattern']">
+            Email must include &#64; and a dot (e.g. name&#64;example.com).
+          </span>
+        </small>
       </div>
 
+      <!-- Phone -->
       <div class="input-field">
         <input
           class="input"
-          placeholder="Phone"
-          required
           name="phone"
-          [(ngModel)]="form.phone" />
+          placeholder="Phone (10 digits)"
+          required
+          [pattern]="phonePattern"
+          [(ngModel)]="form.phone"
+          #phone="ngModel" />
+        <small *ngIf="phone.touched && phone.invalid" style="color:#b00020">
+          <span *ngIf="phone.errors?.['required']">Phone is required.</span>
+          <span *ngIf="phone.errors?.['pattern']">Phone must be exactly 10 digits.</span>
+        </small>
       </div>
 
+      <!-- Password -->
       <div class="input-field">
         <input
           type="password"
           class="input"
+          name="password"
           placeholder="Password"
           required
-          name="password"
-          [(ngModel)]="form.password" />
+          minlength="8"
+          [pattern]="passwordPattern"
+          [(ngModel)]="form.password"
+          #password="ngModel" />
+        <small *ngIf="password.touched && password.invalid" style="color:#b00020">
+          <span *ngIf="password.errors?.['required']">Password is required.</span>
+          <span *ngIf="password.errors?.['minlength']">Must be at least 8 characters.</span>
+          <span *ngIf="password.errors?.['pattern']">
+            Must include at least one uppercase letter and one number.
+          </span>
+        </small>
       </div>
 
       <div class="input-field">
@@ -57,8 +103,10 @@
           type="submit"
           class="submit"
           value="Submit"
-          [disabled]="submitting || !signupForm.form.valid" />
+          [disabled]="submitting || !signupForm.valid" />
       </div>
     </div>
   </div>
 </form>
+
+</div>

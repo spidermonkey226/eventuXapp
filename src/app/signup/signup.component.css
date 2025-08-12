@@ -1,8 +1,17 @@
 *{
     font-family: 'Poppins', sans-serif;
+    
+}
+.signup-bg {
+  min-height: 100vh;
+  background-image: url('/assets/signup.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
 }
 body {
-    background-image: url('/assets/signup.jpg');
+    
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;

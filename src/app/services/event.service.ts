@@ -1,33 +1,58 @@
-import { Injectable } from '@angular/core';
+import { Injectable,inject} from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Event } from '@angular/router';
 
-@Injectable({
-  providedIn: 'root'
-})
+const API = 'http://localhost:8080/api';
+
+export interface AddEventPayload {
+  eventName: string;
+  email: string;
+  phone: string;
+
+  date: string;          // yyyy-MM-dd
+  people: number;
+  eventCategory: string; // must match your backend enum value
+
+  streetName: string;
+  streetNumber: string;
+  postCode: string;
+  city: string;          // must match your backend City enum value
+
+  comments: string;
+
+  hasManager: boolean;
+  managerName?: string;
+  managerEmail?: string;
+  managerPhone?: string;
+}
+
+export interface EventSummary {
+  eventID: number;
+  eventName: string;
+  eventCatgory: string;
+  eventDate: string;
+  expectedPeople: number;
+  comments?: string;
+}
+
+@Injectable({ providedIn: 'root' })
 export class EventService {
-  private baseUrl = 'http://localhost:8080/api/events';
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
-
-  // Get all events from the backend
-  getAll(): Observable<Event[]> {
-    return this.http.get<Event[]>(this.baseUrl);
+  getAll(): Observable<EventSummary[]> {
+    return this.http.get<EventSummary[]>(`${API}/events`);
   }
 
-  // Get a single event by ID
-  getById(id: number): Observable<Event> {
-    return this.http.get<Event>(`${this.baseUrl}/${id}`);
+  getById(id: number): Observable<EventSummary> {
+    return this.http.get<EventSummary>(`${API}/events/${id}`);
   }
 
-  // Create a new event
-  create(event: Event): Observable<Event> {
-    return this.http.post<Event>(this.baseUrl, event);
+  create(body: AddEventPayload): Observable<any> {
+    return this.http.post(`${API}/events`, body);
   }
 
-  // Delete an event by ID
   delete(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+    return this.http.delete<void>(`${API}/events/${id}`);
   }
 }

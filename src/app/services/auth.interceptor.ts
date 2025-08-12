@@ -1,16 +1,32 @@
 // src/app/services/auth.interceptor.ts
 import { HttpInterceptorFn } from '@angular/common/http';
 
+const API_BASE = 'http://localhost:8080/api';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  let token: string | null = null;
+ const isApi = req.url.startsWith(API_BASE);
+  const isAuthEndpoint = isApi && req.url.startsWith(`${API_BASE}/auth/`);
 
-  try {
-    // works in browser; SSR will throw if we touch window — hence try/catch
-    token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  } catch {
-    token = null;
+  if (!isApi || isAuthEndpoint) {
+    return next(req);
   }
 
-  if (!token) return next(req);
-  return next(req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }));
+  let raw: string | null = null;
+  try {
+    raw = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  } catch { raw = null; }
+
+  if (!raw) {
+    // console.debug('[authInterceptor] No token found for', req.url);
+    return next(req);
+  }
+
+  // Normalize token (remove accidental "Bearer " if already stored with it)
+  const token = raw.startsWith('Bearer ') ? raw.slice(7) : raw;
+
+  const authReq = req.clone({
+    setHeaders: { Authorization: `Bearer ${token}` }
+  });
+
+  // console.debug('[authInterceptor] Attaching Authorization header to', req.url);
+  return next(authReq);
 };

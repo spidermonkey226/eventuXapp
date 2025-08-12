@@ -1,122 +1,188 @@
-<link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
 
-<body>
-  <form action="#" #eventForm="ngForm">
-    <!--  General -->
-    <div class="form-group">
-      <h2 class="heading">Add your Event</h2>
-      <!--event name input-->
-      <div class="controls">
-        <i class="bx bx-user"></i> 
-        <input type="text" class="input" placeholder="Event Name" required> 
-            
-      </div>
-      <!--email input-->
-      <div class="controls">
-        <i class='bx bx-envelope'></i>
-        <input type="text" class="input" placeholder="email" required> 
-      </div>       
-      <!--phone input-->
-      <div class="controls">
-        <i class='bx bx-phone'></i>
-        <input type="text" class="input" placeholder="phone" required>
-      </div>
-      <!--event addres input-->
-      <div class="grid">
-        <!--street input-->
-        <div class="col-2-3">
-          <div class="controls">
-            <i class="bi bi-signpost"></i>
-            <input type="text" class="input" placeholder="street" required>
-          </div>          
-        </div>
-        <!--street number input-->
-        <div class="col-1-3">
-          <div class="controls">
-            <input type="text" class="input" placeholder="street-number" required>
-          </div>          
-        </div>
-      </div>
-      <!--city input-->
-      <div class="grid">
-        <div class="col-2-3">
-          <div class="controls">
-            <i class='bx bx-buildings' ></i>
-            <input type="text" class="input" placeholder="city" required>
-          </div>         
-        </div>
-        <!--city psot code input-->
-        <div class="col-1-3">
-          <div class="controls">
-            <input type="text" class="input" placeholder="post-code" required>
-          </div>         
-        </div>
-      </div>
-    </div>
-    <!--  Details -->
-    <div class="form-group">
-      <h2 class="heading">Details</h2>
-      <!--event date input-->
-      <div class="controls">
-        <i class='bx bxs-calendar' ></i>
-        <input type="date" class="input" placeholder="Date" required>
-      </div>   
-      <!--number of people input-->
-      <div class="controls">
-        <i class='bx bx-male-female'></i>
-        <input type="text" class="input" placeholder="People" required>
-      </div>   
-        <!-- Event Category -->
+<form #eventForm="ngForm" (ngSubmit)="submit(eventForm)" novalidate>
   <div class="form-group">
-    <h2 class="heading">Event Category</h2>
+    <h2 class="heading">Add your Event</h2>
+
+    <!-- Event name -->
     <div class="controls">
-      <i class='bx bx-category'></i>
-      <select class="input" required [(ngModel)]="eventCategory" name="eventCategory">
-        <option value="" disabled selected>Select a category</option>
-        <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
-      </select>
+      <i class="bx bx-user"></i>
+      <input
+        type="text"
+        class="input"
+        placeholder="Event Name"
+        required
+        name="eventName"
+        [(ngModel)]="form.eventName"
+        #eventName="ngModel" />
     </div>
-  </div>
-   <!-- Manager Question -->
-  <div class="form-group">
-    <h2 class="heading">Event Manager</h2>
-    <div class="controls">
-      <label>
-        <input type="checkbox" [(ngModel)]="hasManager" name="hasManager"> 
-        Is there a manager for this event?
-      </label>
+    <small *ngIf="(submitted || eventName.touched) && eventName.invalid" class="error">
+      Event name is required.
+    </small>
+
+    <!-- Email (host) -->
+    <div class="input-field">
+      <input type="email" class="input" name="email" placeholder="Email"
+             required [pattern]="emailPattern" [(ngModel)]="form.email" #email="ngModel" />
+      <small *ngIf="(submitted || email.touched) && email.invalid" class="error">
+        <span *ngIf="email.errors?.['required']">Email is required.</span>
+        <span *ngIf="email.errors?.['pattern']">Email must include &#64; and a dot (e.g. name&#64;example.com).</span>
+      </small>
     </div>
 
-    <!-- Conditionally show manager fields -->
-    <div *ngIf="hasManager">
-      <div class="controls">
-        <i class="bx bx-user"></i>
-        <input type="text" class="input" placeholder="Manager Name" [(ngModel)]="manager.name" name="managerName" required>
-      </div>
-      <div class="controls">
-        <i class='bx bx-envelope'></i>
-        <input type="email" class="input" placeholder="Manager Email" [(ngModel)]="manager.email" name="managerEmail" required>
-      </div>
-      <div class="controls">
-        <i class='bx bx-phone'></i>
-        <input type="tel" class="input" placeholder="Manager Phone" [(ngModel)]="manager.phone" name="managerPhone" required>
-      </div>
+    <!-- Phone (host) -->
+    <div class="input-field">
+      <input type="tel" class="input" name="phone" placeholder="Phone"
+             required [pattern]="phonePattern" [(ngModel)]="form.phone" #phone="ngModel" />
+      <small *ngIf="(submitted || phone.touched) && phone.invalid" class="error">
+        <span *ngIf="phone.errors?.['required']">Phone is required.</span>
+        <span *ngIf="phone.errors?.['pattern']">Phone must be exactly 10 digits.</span>
+      </small>
     </div>
-  </div>
 
-       
-      <p class="info-text">Please describe your needs e.g. children's chair</p>  
-      <div class="grid">
-        
-        <br>
+    <!-- Address -->
+    <div class="grid">
+      <div class="col-2-3">
         <div class="controls">
-          <i class='bx bx-chat' ></i>
-          <textarea name="comments" class="floatLabel" id="comments" placeholder="Comments"></textarea>
+          <i class="bi bi-signpost"></i>
+          <input type="text" class="input" placeholder="Street"
+                 required name="streetName" [(ngModel)]="form.streetName" #streetName="ngModel" />
         </div>
-        
-      </div>  
-      <button type="submit" value="Submit" class="col-1-4">Submit</button>
-    </div> <!-- /.form-group -->
-  </form>
-</body>
+        <small *ngIf="(submitted || streetName.touched) && streetName.invalid" class="error">
+          Street is required.
+        </small>
+      </div>
+
+      <div class="col-1-3">
+        <div class="controls">
+          <input type="text" class="input" placeholder="Street number"
+                 required name="streetNumber" [(ngModel)]="form.streetNumber" #streetNumber="ngModel" />
+        </div>
+        <small *ngIf="(submitted || streetNumber.touched) && streetNumber.invalid" class="error">
+          Street number is required.
+        </small>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="col-2-3">
+        <div class="controls">
+          <i class="bx bx-buildings"></i>
+          <select class="input" required name="city" [(ngModel)]="form.city" #city="ngModel">
+            <option value="" disabled>Select a city</option>
+            <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
+          </select>
+        </div>
+        <small *ngIf="(submitted || city.touched) && city.invalid" class="error">
+          City is required.
+        </small>
+      </div>
+
+      <div class="col-1-3">
+        <div class="controls">
+          <input type="text" class="input" placeholder="Post code"
+                 required name="postCode" [(ngModel)]="form.postCode" #postCode="ngModel" />
+        </div>
+        <small *ngIf="(submitted || postCode.touched) && postCode.invalid" class="error">
+          Post code is required.
+        </small>
+      </div>
+    </div>
+  </div>
+
+  <!-- Details -->
+  <div class="form-group">
+    <h2 class="heading">Details</h2>
+
+    <!-- Date (no past) -->
+    <div class="controls">
+      <i class="bx bxs-calendar"></i>
+      <input type="date" class="input" placeholder="Date"
+             required name="date" [min]="minDate" [(ngModel)]="form.date" #dateCtrl="ngModel" />
+    </div>
+    <small *ngIf="(submitted || dateCtrl.touched) && dateCtrl.invalid" class="error">
+      Please choose a date (today or later).
+    </small>
+
+    <!-- People (positive) -->
+    <div class="controls">
+      <i class="bx bx-male-female"></i>
+      <input type="number" class="input" placeholder="People"
+             required min="1" name="people" [(ngModel)]="form.people" #people="ngModel" />
+    </div>
+    <small *ngIf="(submitted || people.touched) && people.invalid" class="error">
+      People must be at least 1.
+    </small>
+
+    <!-- Category -->
+    <div class="form-group">
+      <h2 class="heading">Event Category</h2>
+      <div class="controls">
+        <i class="bx bx-category"></i>
+        <select class="input" required name="eventCategory"
+                [(ngModel)]="form.eventCategory" #eventCategory="ngModel">
+          <option value="" disabled>Select a category</option>
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+      <small *ngIf="(submitted || eventCategory.touched) && eventCategory.invalid" class="error">
+        Category is required.
+      </small>
+    </div>
+
+    <!-- Manager -->
+    <div class="form-group">
+      <h2 class="heading">Event Manager</h2>
+      <div class="controls">
+        <label>
+          <input type="checkbox" [(ngModel)]="form.hasManager" name="hasManager">
+          Is there a manager for this event?
+        </label>
+      </div>
+
+      <div *ngIf="form.hasManager">
+        <div class="input-field">
+          <input type="text" class="input" placeholder="Manager Name"
+                 required name="managerName" [(ngModel)]="form.managerName" #managerName="ngModel" />
+          <small *ngIf="(submitted || managerName.touched) && managerName.invalid" class="error">
+            Manager name is required.
+          </small>
+        </div>
+
+        <div class="input-field">
+          <input type="email" class="input" placeholder="Manager Email"
+                 required [pattern]="emailPattern" name="managerEmail"
+                 [(ngModel)]="form.managerEmail" #managerEmail="ngModel" />
+          <small *ngIf="(submitted || managerEmail.touched) && managerEmail.invalid" class="error">
+            <span *ngIf="managerEmail.errors?.['required']">Manager email is required.</span>
+            <span *ngIf="managerEmail.errors?.['pattern']">
+              Manager email must include &#64; and a dot (e.g. name&#64;example.com).
+            </span>
+          </small>
+        </div>
+
+        <div class="input-field">
+          <input type="tel" class="input" placeholder="Manager Phone"
+                 required [pattern]="phonePattern" name="managerPhone"
+                 [(ngModel)]="form.managerPhone" #managerPhone="ngModel" />
+          <small *ngIf="(submitted || managerPhone.touched) && managerPhone.invalid" class="error">
+            <span *ngIf="managerPhone.errors?.['required']">Manager phone is required.</span>
+            <span *ngIf="managerPhone.errors?.['pattern']">Manager phone must be exactly 10 digits.</span>
+          </small>
+        </div>
+      </div>
+    </div>
+
+    <p class="info-text">Please describe your needs e.g. children's chair</p>
+    <div class="controls">
+      <i class="bx bx-chat"></i>
+      <textarea class="floatLabel" placeholder="Comments"
+                name="comments" [(ngModel)]="form.comments"></textarea>
+    </div>
+
+    <button type="submit" class="col-1-4" [disabled]="submitting">Submit</button>
+    <p class="error" *ngIf="topError">{{ topError }}</p>
+    <p class="success" *ngIf="successMsg">{{ successMsg }}</p>
+  </div>
+</form>

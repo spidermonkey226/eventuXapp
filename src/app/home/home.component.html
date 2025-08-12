@@ -8,8 +8,12 @@
     <div class="hero-content container">
         <h1>EventuX: Your Event, Perfectly Planned.</h1>
         <p>Eventus, the next-generation event planner that make your event perfect</p>
-
-        <a routerLink="/addevent" routerLinkActive="active" class="cta-button">Add your Event now</a>
+        <ng-container *ngIf="!(isLoggedIn$ | async); else logged">
+            <a routerLink="/signin" routerLinkActive="active" class="cta-button">Add your Event now</a>
+        </ng-container>
+        <ng-template #logged>
+            <a routerLink="/addevent" routerLinkActive="active" class="cta-button">Add your Event now</a>
+        </ng-template>
     </div>
 </section>
 

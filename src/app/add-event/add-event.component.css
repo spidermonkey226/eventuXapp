@@ -32,7 +32,21 @@ h2.heading {
     margin-bottom: 15px;
     width: 100%;
 }
-
+.input-field{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    width: 100%;
+}
+.input-field .input {
+    height: 45px;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
 .controls .input {
     height: 45px;
     width: 100%;
