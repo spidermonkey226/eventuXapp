@@ -111,7 +111,9 @@ export class ProfileComponent implements OnInit {
     this.formModel.newPassword = this.formModel.confirmPassword = '';
     this.selectedFile = null;
     alert('Profile updated successfully');
+
   }
+
 
   onImageSelected(event: any): void {
     const file = event.target.files?.[0];
