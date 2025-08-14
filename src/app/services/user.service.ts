@@ -45,4 +45,7 @@ uploadMyAvatar(file: File) {
   updateUser(id: number, user: Partial<User>): Observable<any> { 
     return this.http.put<any>(`${this.apiUrl}/${id}`, user);
   }
+   deleteUser(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/${id}`);
+  }
 }

@@ -1,7 +1,14 @@
-import { Component ,OnInit} from '@angular/core';
-import { InvitedService } from '../services/invited.service';
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule, DatePipe, NgIf, NgFor } from '@angular/common';
+import { ActivatedRoute, RouterModule } from '@angular/router';
+import { forkJoin, map, switchMap } from 'rxjs';
+import { InvitedService ,InvitedDTO } from '../services/invited.service';
 import { Invited } from '../class/invited';
-import { CommonModule } from '@angular/common';
+import { EventService, EventDetail } from '../services/event.service';
+
+
+type RSVP = 'COMING' | 'NOT_COMING' | 'NO_RESPONSE';
+
 
 @Component({
   selector: 'app-event-manger',
@@ -10,46 +17,80 @@ import { CommonModule } from '@angular/common';
   styleUrl: './event-manger.component.css'
 })
 export class EventManagerComponent implements OnInit {
-  guests: Invited[] = [];
+  private route = inject(ActivatedRoute);
+  private invitedService = inject(InvitedService);
+  private eventService = inject(EventService);
+
+  // UI state
+  loading = true;
+  error = '';
 
   // Event info
-  eventName: string = '';
-  eventId: number | null = null;
+  eventId!: number;
+  event?: EventDetail;
 
-  // Statistics
+  // Guests + stats
+  guests: InvitedDTO[] = [];
+
   totalGuests = 0;
   comingCount = 0;
   notComingCount = 0;
   noResponseCount = 0;
 
-  constructor(private invitedService: InvitedService) {}
-
-  ngOnInit(): void {
-    this.loadGuests();
-  }
-
-  loadGuests(): void {
-    this.invitedService.getAll().subscribe({
-      next: (data: Invited[]) => {
-        this.guests = data;
-        this.calculateStats();
-
-        // Extract event info (assumes all guests are for the same event)
-        if (this.guests.length > 0) {
-          this.eventName = this.guests[0].event.name;
-          this.eventId = this.guests[0].event.eventId;
+   ngOnInit(): void {
+    this.route.paramMap
+      .pipe(
+        map(params => Number(params.get('id'))),
+        switchMap(id => {
+          if (!id || Number.isNaN(id)) throw new Error('Invalid event id');
+          this.eventId = id;
+          return forkJoin({
+            event: this.eventService.getById(id),
+            guests: this.invitedService.getByEventId(id),
+          });
+        })
+      )
+      .subscribe({
+        next: ({ event, guests }) => {
+          this.event = event;
+          this.guests = guests ?? [];
+          this.computeStats();
+          this.loading = false;
+        },
+        error: (err) => {
+          this.error = err?.message || 'Failed to load event or guests';
+          this.loading = false;
         }
-      },
-      error: (err) => {
-        console.error('Failed to load invited guests', err);
-      }
-    });
+      });
   }
 
-  calculateStats(): void {
-    this.totalGuests = this.guests.length;
-    this.comingCount = this.guests.filter(g => g.coming === true).length;
-    this.notComingCount = this.guests.filter(g => g.coming === false).length;
-    this.noResponseCount = this.guests.filter(g => g.coming === undefined || g.coming === null).length;
+  private computeStats(): void {
+  const norm = (g: InvitedDTO): RSVP =>
+    g.coming === true ? 'COMING'
+    : g.coming === false ? 'NOT_COMING'
+    : 'NO_RESPONSE';
+
+  this.totalGuests = this.guests.length;
+  this.comingCount = this.guests.filter(g => norm(g) === 'COMING').length;
+  this.notComingCount = this.guests.filter(g => norm(g) === 'NOT_COMING').length;
+  this.noResponseCount = this.guests.filter(g => norm(g) === 'NO_RESPONSE').length;
+}
+
+  // helpers
+   eventName(): string {
+    return this.event?.eventName ?? (this as any).event?.name ?? 'Event';
+  }
+  eventCode(): number | undefined {
+    return this.event?.eventID ?? this.event?.eventId ?? this.event?.id;
+  }
+  fullName(u?: { firstName?: string; lastName?: string }): string {
+    return u ? [u.firstName, u.lastName].filter(Boolean).join(' ') : '';
+  }
+   guestEmail(g: InvitedDTO): string {
+    return g?.email || '';
+  }
+
+  dateFmt(): string {
+    return this.event?.eventDate || '';
   }
 }

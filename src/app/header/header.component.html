@@ -1,5 +1,5 @@
 <header>
-  <nav class="container">
+  <nav class="container navbar">
     <div class="navbar-logo">
       <a routerLink="/home">
         <img class="logo" src="assets/eventuxLogo-removebg.png" alt="JetJoy Logo">
@@ -11,6 +11,14 @@
       <li><a href="#why-choose-us">Why Choose US</a></li>
       <li><a href="#customer-reviews">Our customer</a></li>
       <li><a [routerLink]="['/event-manager']">Your Event</a></li>
+       <li><a [routerLink]="['/file-upload']">Upload Your Pictures</a></li>
+      <!-- Only show to users with permission above guest -->
+      <li *ngIf="hasEventAccess$ | async">
+        <a [routerLink]="['/user-events']">Your Events</a>
+      </li>
+      <li *ngIf="adminAccess$ | async">
+        <a [routerLink]="['/admin']">mange app</a>
+      </li>
     </ul>
 
     <div>
@@ -23,7 +31,7 @@
         <!-- logged in -->
         <ng-template #logged>
         <button [routerLink]="['/profile']">Profile</button>
-        <button (click)="logout()">Logout</button>
+        <button  class="logout-btn" (click)="logout()">Logout</button>
         </ng-template>
     </div>
   </nav>

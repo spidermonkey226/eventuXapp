@@ -1,0 +1,42 @@
+<div class="rsvp-container" [ngClass]="event?.rsvpSettings?.theme || 'default'">
+  <!-- Error State -->
+  <div *ngIf="error" class="error">
+    <h3>{{ error }}</h3>
+  </div>
+
+  <!-- Confirmation State -->
+  <div *ngIf="confirmed">
+    <h2>Thank you, {{ guest.firstName }}!</h2>
+    <p>Your RSVP has been recorded as <strong>{{ response === 'yes' ? 'Attending' : 'Not Attending' }}</strong>.</p>
+    <p>We look forward to seeing you{{ response === 'yes' ? '!' : ' next time.' }}</p>
+  </div>
+
+  <!-- RSVP Form -->
+  <div *ngIf="!confirmed && !error">
+    <h2>{{ event?.name || "You're Invited!" }}</h2>
+    <p>{{ event?.rsvpSettings?.customMessage || "Please confirm your attendance to the event." }}</p>
+
+    <form (ngSubmit)="submit()" #rsvpForm="ngForm">
+      <div class="form-group">
+        <label>{{ event?.rsvpSettings?.questionText || "Will you attend?" }}</label>
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="response" [(ngModel)]="response" value="yes" required /> Yes
+          </label>
+          <label>
+            <input type="radio" name="response" [(ngModel)]="response" value="no" /> No
+          </label>
+        </div>
+      </div>
+
+      <div class="form-group" *ngIf="event?.rsvpSettings?.showNote !== false">
+        <label for="note">Leave a note:</label>
+        <textarea id="note" rows="4" [(ngModel)]="note" name="note" placeholder="Any comments?"></textarea>
+      </div>
+
+      <button type="submit" [disabled]="!response">
+        {{ event?.rsvpSettings?.buttonText || "Send" }}
+      </button>
+    </form>
+  </div>
+</div>

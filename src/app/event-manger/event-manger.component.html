@@ -1,53 +1,91 @@
-<div class="dashboard-container">
+<!-- src/app/event-manger/event-manger.component.html -->
+<div class="em-container">
+  <div *ngIf="loading" class="em-state">Loading event data…</div>
+  <div *ngIf="!loading && error" class="em-error">{{ error }}</div>
 
-  <!-- Event Title -->
-  <div class="event-title">
-    Event Manager: {{ eventName }} (ID: {{ eventId }})
-  </div>
+  <ng-container *ngIf="!loading && !error">
+    <!-- Event title / summary -->
+    <div class="em-header">
+      <h1 class="em-title">
+        Event Manager: {{ eventName() }}
+        <span class="em-sub">(ID: {{ eventCode() }})</span>
+      </h1>
 
-  <!-- RSVP Statistics -->
-  <div class="stats-grid">
-    <div class="stat-card">
-      <h3>Attending</h3>
-      <p>{{ comingCount }}</p>
+      <div class="em-meta">
+        <div>
+          <div class="em-meta-label">Date</div>
+          <div class="em-meta-value">{{ dateFmt() | date:'mediumDate' }}</div>
+        </div>
+        <div>
+          <div class="em-meta-label">Category</div>
+          <div class="em-meta-value">{{ event?.eventCatgory }}</div>
+        </div>
+        <div>
+          <div class="em-meta-label">Address</div>
+          <div class="em-meta-value">
+            {{ event?.address?.streetName }} {{ event?.address?.streetNumber }},
+            {{ event?.address?.city }} {{ event?.address?.postCode }}
+          </div>
+        </div>
+        <div>
+          <div class="em-meta-label">Creator</div>
+          <div class="em-meta-value">
+            {{ fullName(event?.host) || event?.host?.email }}
+          </div>
+        </div>
+        <div>
+          <div class="em-meta-label">Manager</div>
+          <div class="em-meta-value">
+            {{ fullName(event?.manager) || event?.manager?.email }}
+          </div>
+        </div>
+      </div>
     </div>
-    <div class="stat-card">
-      <h3>Not Attending</h3>
-      <p>{{ notComingCount }}</p>
-    </div>
-    <div class="stat-card">
-      <h3>No Response</h3>
-      <p>{{ noResponseCount }}</p>
-    </div>
-    <div class="stat-card">
-      <h3>Total Invited</h3>
-      <p>{{ totalGuests }}</p>
-    </div>
-  </div>
 
-  <!-- Optional: Guest List Table -->
-  <div class="guest-list">
-    <h3>Guest List</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>First Name</th>
-          <th>Email</th>
-          <th>RSVP Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let guest of guests">
-          <td>{{ guest.firstName }}</td>
-          <td>{{ guest.id.email }}</td>
-          <td>
-            <span *ngIf="guest.coming === true">Coming</span>
-            <span *ngIf="guest.coming === false">Not Coming</span>
-            <span *ngIf="guest.coming === undefined || guest.coming === null">No Response</span>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>Attending</h3>
+        <p>{{ comingCount }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Not Attending</h3>
+        <p>{{ notComingCount }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>No Response</h3>
+        <p>{{ noResponseCount }}</p>
+      </div>
+      <div class="stat-card">
+        <h3>Total Invited</h3>
+        <p>{{ totalGuests }}</p>
+      </div>
+    </div>
 
+    <!-- Guest list -->
+    <div class="guest-list">
+      <h3>Guest List</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>First Name</th>
+            <th>Email</th>
+            <th>RSVP Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let guest of guests">
+            <td>{{ guest.firstName }}</td>
+            <td>{{ guestEmail(guest) }}</td>
+            <td>
+              <span class="chip" *ngIf="guest.coming === true">Coming</span>
+              <span class="chip warn" *ngIf="guest.coming === false">Not Coming</span>
+              <span class="chip muted" *ngIf="guest.coming === undefined || guest.coming === null">No Response</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </ng-container>
 </div>

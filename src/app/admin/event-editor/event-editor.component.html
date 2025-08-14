@@ -1,0 +1,109 @@
+<div class="event-editor">
+
+  <!-- LIST MODE -->
+  <ng-container *ngIf="!isEditMode; else editModeTpl">
+    <h2>Events</h2>
+
+    <!-- 🔍 Search Bar -->
+    <div class="search-bar" style="margin-bottom: 10px;">
+      <input
+        type="text"
+        placeholder="Search events..."
+        [(ngModel)]="searchTerm"
+      />
+    </div>
+
+    <table *ngIf="!loading; else loadingTpl">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Date</th>
+          <th>Expected People</th>
+          <th>City</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let e of filteredEvents">
+          <td>{{ e.eventName }}</td>
+          <td>{{ e.eventCatgory }}</td>
+          <td>{{ e.eventDate | date }}</td>
+          <td>{{ e.expectedPeople }}</td>
+          <td>{{ e.address?.city }}</td>
+          <td>
+            <button (click)="editEvent(e.eventID)">Edit</button>
+            <button (click)="deleteEvent(e.eventID)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #loadingTpl>
+      <p>Loading events...</p>
+    </ng-template>
+  </ng-container>
+
+  <!-- EDIT MODE -->
+  <ng-template #editModeTpl>
+    <h2>Edit Event</h2>
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <label>Name
+        <input type="text" formControlName="eventName" />
+      </label>
+
+      <label>Category
+        <select formControlName="eventCatgory">
+          <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
+        </select>
+      </label>
+
+      <label>Date
+        <input type="date" formControlName="eventDate" />
+      </label>
+
+      <label>Expected People
+        <input type="number" formControlName="expectedPeople" />
+      </label>
+
+      <label>Comments
+        <textarea formControlName="comments"></textarea>
+      </label>
+
+      <fieldset formGroupName="address">
+        <legend>Address</legend>
+        <label>Street
+          <input type="text" formControlName="streetName" />
+        </label>
+        <label>Street Number
+          <input type="text" formControlName="streetNumber" />
+        </label>
+        <label>Post Code
+          <input type="text" formControlName="postCode" />
+        </label>
+        <label>City
+          <input type="text" formControlName="city" />
+        </label>
+      </fieldset>
+
+      <fieldset formGroupName="host">
+        <legend>Host</legend>
+        <label>Email
+          <input type="email" formControlName="email" />
+        </label>
+      </fieldset>
+
+      <fieldset formGroupName="manager">
+        <legend>Manager</legend>
+        <label>Email
+          <input type="email" formControlName="email" />
+        </label>
+      </fieldset>
+
+      <div class="actions">
+        <button type="button" (click)="cancel()">Cancel</button>
+        <button type="submit">Save</button>
+      </div>
+    </form>
+  </ng-template>
+</div>

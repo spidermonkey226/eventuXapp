@@ -124,7 +124,7 @@ export class AddEventComponent implements OnInit {
       next: () => {
         this.successMsg = 'Event created successfully!';
         this.submitting = false;
-        // this.router.navigateByUrl('/'); // uncomment if you want redirect
+        this.router.navigateByUrl('/event-manager'); // uncomment if you want redirect
       },
       error: (err) => {
         this.submitting = false;

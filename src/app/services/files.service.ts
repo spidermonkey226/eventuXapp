@@ -3,6 +3,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Files } from '../class/files';
 
+export interface UploadedFile {
+  id: string;             // align with your Spring DTO
+  originalName: string;
+  url: string;            // e.g. /files/<uuid>.ext (served statically)
+  size: number;
+  contentType: string | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -29,5 +37,19 @@ export class FilesService {
   // Delete a file by ID
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  }
+
+  uploadFile(file: File): Observable<UploadedFile> {
+    const fd = new FormData();
+    fd.append('file', file);
+     return this.http.post<UploadedFile>(this.baseUrl, fd);
+  }
+  uploadFiles(files: File[], eventId: number, userId: number): Observable<UploadedFile[]> {
+    const fd = new FormData();
+    files.forEach(f => fd.append('files', f));
+    fd.append('eventId', String(eventId));
+    fd.append('userId', String(userId));
+
+    return this.http.post<UploadedFile[]>(`${this.baseUrl}/batch`, fd);
   }
 }

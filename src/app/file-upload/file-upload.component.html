@@ -1,0 +1,45 @@
+<section class="upload-card">
+  <h1 class="title">File upload</h1>
+
+  <form (submit)="onSubmit($event)">
+    <label class="file-picker" for="fileInput">
+      <input
+        id="fileInput"
+        type="file"
+        (change)="onFilesSelected($event)"
+        [attr.multiple]="allowMultiple ? '' : null"
+        [accept]="acceptTypes"
+      />
+      <span>Choose file(s)</span>
+    </label>
+
+    <div class="selected" *ngIf="files.length">
+      <h2>Selected ({{ files.length }})</h2>
+      <ul>
+        <li *ngFor="let f of files; let i = index">
+          <div class="file-row">
+            <div class="meta">
+              <strong>{{ f.name }}</strong>
+              <small>{{ f.type || 'Unknown type' }} • {{ (f.size / 1024) | number:'1.0-0' }}KB</small>
+            </div>
+            <button type="button" class="remove" (click)="remove(i)">Remove</button>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div class="actions">
+      <button type="submit" [disabled]="!files.length || uploading">
+        {{ uploading ? 'Uploading…' : 'Upload' }}
+      </button>
+      <button type="button" class="secondary" (click)="clear()" [disabled]="!files.length || uploading">
+        Clear
+      </button>
+    </div>
+
+    <p class="hint">Max {{ maxSizeMB }}MB per file. Allowed types: {{ acceptTypes || 'Any' }}</p>
+
+    <p class="msg ok" *ngIf="message && success">{{ message }}</p>
+    <p class="msg err" *ngIf="message && !success">{{ message }}</p>
+  </form>
+</section>

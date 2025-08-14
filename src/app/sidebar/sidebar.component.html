@@ -1,21 +1,9 @@
-<p>sidebar works!</p>
-<div class="container">
-    <ul>
-      <li>
-        <button (click)="selectCategory('all')">All</button>
-      </li>
-      <li>
-        <button (click)="selectCategory('products')">Deals</button>
-      </li>
-      <li>
-        <button (click)="selectCategory('flights')">Flights</button>
-      </li>
-      <li>
-        <button (click)="selectCategory('hotels')">Hotels</button>
-      </li>
-      <li>
-        <button (click)="selectCategory('cars')">Car Rent</button>
-      </li>
-    </ul>
-  </div>
-  
+<aside class="sidebar">
+  <div class="brand">{{ title }}</div>
+
+  <nav class="nav">
+    <a routerLink="/admin/users" routerLinkActive="active" class="nav-link">Users</a>
+    <a routerLink="/admin/events" routerLinkActive="active" class="nav-link">Events</a>
+    <a routerLink="/admin/tickets" routerLinkActive="active" class="nav-link">Tickets</a>
+  </nav>
+</aside>

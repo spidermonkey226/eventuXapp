@@ -1,0 +1,87 @@
+<div class="user-editor">
+
+  <!-- LIST MODE -->
+  <ng-container *ngIf="!isEditMode; else editModeTpl">
+    <h2>Users</h2>
+
+    <!-- 🔍 Search Bar -->
+    <div class="search-bar" style="margin-bottom: 10px;">
+      <input
+        type="text"
+        placeholder="Search users..."
+        [(ngModel)]="searchTerm"
+      />
+    </div>
+
+    <table *ngIf="!loading; else loadingTpl">
+      <thead>
+        <tr>
+          <th>First</th>
+          <th>Last</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Permission</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of filteredUsers">
+          <td>{{ user.firstName }}</td>
+          <td>{{ user.lastName }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.phone }}</td>
+          <td>{{ user.permission }}</td>
+          <td>{{ user.date | date }}</td>
+          <td>
+            <button (click)="editUser(user.idUser)">Edit</button>
+            <button (click)="deleteUser(user.idUser)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #loadingTpl>
+      <p>Loading...</p>
+    </ng-template>
+  </ng-container>
+
+  <!-- EDIT MODE -->
+  <ng-template #editModeTpl>
+    <h2>Edit User</h2>
+    <form [formGroup]="form" (ngSubmit)="save()">
+      <label>First Name
+        <input type="text" formControlName="firstName" />
+      </label>
+
+      <label>Last Name
+        <input type="text" formControlName="lastName" />
+      </label>
+
+      <label>Email
+        <input type="email" formControlName="email" />
+      </label>
+
+      <label>Phone
+        <input type="tel" formControlName="phone" />
+      </label>
+
+      <label>Password
+        <input type="password" formControlName="password" placeholder="Leave blank to keep current" />
+      </label>
+
+      <label>Permission
+        <select formControlName="permission">
+          <option *ngFor="let perm of permissions" [value]="perm.id">
+            {{ perm.label }}
+          </option>
+        </select>
+      </label>
+
+      <div class="actions">
+        <button type="button" (click)="cancel()">Cancel</button>
+        <button type="submit">Save</button>
+      </div>
+    </form>
+  </ng-template>
+</div>

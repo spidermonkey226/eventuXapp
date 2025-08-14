@@ -1,0 +1,21 @@
+<div class="admin-shell">
+  <!-- Sidebar (your component) -->
+  <app-sidebar class="sidebar-wrap" [title]="'EventuX Admin'"></app-sidebar>
+
+  <!-- Main area -->
+  <div class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <h1 class="title">Admin</h1>
+        <p class="subtitle">Manage users, events, and tickets</p>
+      </div>
+      <div class="topbar-right">
+        <!-- put profile/logout later if you want -->
+      </div>
+    </header>
+
+    <section class="content">
+      <router-outlet></router-outlet>
+    </section>
+  </div>
+</div>

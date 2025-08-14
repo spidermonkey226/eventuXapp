@@ -1,0 +1,78 @@
+<div class="ue-container">
+
+  <h1 class="ue-title">My Events</h1>
+
+  <div *ngIf="loading" class="ue-state">Loading your events…</div>
+  <div *ngIf="!loading && error" class="ue-error">{{ error }}</div>
+
+  <ng-container *ngIf="!loading && !error">
+    <!-- Creator section -->
+    <section class="ue-section" *ngIf="mineAsCreator.length > 0">
+      <h2 class="ue-section-title">I’m the creator</h2>
+      <div class="ue-grid">
+        <article class="ue-card" *ngFor="let ev of mineAsCreator">
+          <div class="ue-card-head">
+            <h3 class="ue-card-title">{{ ev.eventName }}</h3>
+            <span class="ue-badge">{{ ev.eventCatgory }}</span>
+          </div>
+          <div class="ue-card-row">
+            <span class="ue-label">Date</span>
+            <span>{{ ev.eventDate | date:'mediumDate' }}</span>
+          </div>
+          <div class="ue-card-row" *ngIf="ev.address">
+            <span class="ue-label">Address</span>
+            <span>
+              {{ ev.address.streetName }} {{ ev.address.streetNumber }},
+              {{ ev.address.city }} {{ ev.address.postCode }}
+            </span>
+          </div>
+          <div class="ue-card-row">
+            <span class="ue-label">Manager</span>
+            <span>{{ fullName(ev.manager) || ev.manager.email }}</span>
+          </div>
+
+          <button class="ue-btn" (click)="openEvent(ev)">
+            Open event settings
+            </button>
+        </article>
+      </div>
+    </section>
+
+    <!-- Manager section -->
+    <section class="ue-section" *ngIf="mineAsManager.length > 0">
+      <h2 class="ue-section-title">I’m the manager</h2>
+      <div class="ue-grid">
+        <article class="ue-card" *ngFor="let ev of mineAsManager">
+          <div class="ue-card-head">
+            <h3 class="ue-card-title">{{ ev.eventName }}</h3>
+            <span class="ue-badge alt">{{ ev.eventCatgory }}</span>
+          </div>
+          <div class="ue-card-row">
+            <span class="ue-label">Date</span>
+            <span>{{ ev.eventDate | date:'mediumDate' }}</span>
+          </div>
+          <div class="ue-card-row" *ngIf="ev.address">
+            <span class="ue-label">Address</span>
+            <span>
+              {{ ev.address.streetName }} {{ ev.address.streetNumber }},
+              {{ ev.address.city }} {{ ev.address.postCode }}
+            </span>
+          </div>
+          <div class="ue-card-row">
+            <span class="ue-label">Creator</span>
+            <span>{{ fullName(ev.host) || ev.host.email }}</span>
+          </div>
+
+          <!-- manager cards -->
+            <button class="ue-btn" (click)="openEvent(ev)">
+            Open manager panel
+            </button>
+        </article>
+      </div>
+    </section>
+
+    <section *ngIf="mineAsCreator.length === 0 && mineAsManager.length === 0" class="ue-empty">
+      You don’t have any events yet.
+    </section>
+  </ng-container>
+</div>

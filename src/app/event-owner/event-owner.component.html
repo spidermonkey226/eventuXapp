@@ -1,0 +1,137 @@
+<div class="eo-container">
+  <div *ngIf="loading" class="eo-state">Loading owner panel…</div>
+  <div *ngIf="!loading && error" class="eo-error">{{ error }}</div>
+
+  <ng-container *ngIf="!loading && !error">
+    <!-- Header -->
+    <div class="eo-header">
+      <h1 class="eo-title">
+        Event Owner: {{ eventName() }}
+        <span class="eo-sub">(ID: {{ eventCode() }})</span>
+      </h1>
+
+      <div class="eo-meta">
+        <div>
+          <div class="eo-meta-label">Date</div>
+          <div class="eo-meta-value">{{ dateFmt() | date:'mediumDate' }}</div>
+        </div>
+        <div>
+          <div class="eo-meta-label">Category</div>
+          <div class="eo-meta-value">{{ event?.eventCatgory }}</div>
+        </div>
+        <div>
+          <div class="eo-meta-label">Address</div>
+          <div class="eo-meta-value">
+            {{ event?.address?.streetName }} {{ event?.address?.streetNumber }},
+            {{ event?.address?.city }} {{ event?.address?.postCode }}
+          </div>
+        </div>
+        <div>
+          <div class="eo-meta-label">Manager</div>
+          <div class="eo-meta-value">
+            {{ fullName(event?.manager) || event?.manager?.email }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card"><h3>Attending</h3><p>{{ comingCount }}</p></div>
+      <div class="stat-card"><h3>Not Attending</h3><p>{{ notComingCount }}</p></div>
+      <div class="stat-card"><h3>No Response</h3><p>{{ noResponseCount }}</p></div>
+      <div class="stat-card"><h3>Total Invited</h3><p>{{ totalGuests }}</p></div>
+    </div>
+
+    <!-- Files -->
+    <section class="eo-section">
+      <h2 class="eo-section-title">Files</h2>
+      <div class="eo-files">
+        <input type="file" multiple (change)="onFilePick($event)" [disabled]="uploading" />
+        <span *ngIf="uploading" class="eo-state sm">Uploading…</span>
+
+        <ul class="eo-file-list" *ngIf="files.length > 0">
+          <li *ngFor="let f of files">
+            <span class="file-name">{{ f.name || ('File #' + f.id) }}</span>
+            <button class="link danger" (click)="deleteFile(f.id!)">Delete</button>
+          </li>
+        </ul>
+        <div *ngIf="!files.length" class="eo-muted">No files yet.</div>
+      </div>
+    </section>
+
+    <!-- Add single invite -->
+    <section class="eo-section">
+      <h2 class="eo-section-title">Add Invite</h2>
+      <form #addForm="ngForm" (ngSubmit)="addInvite(addForm)" class="row gap">
+        <input class="input" name="firstName" placeholder="First name" [(ngModel)]="newInvite.firstName" required />
+        <input class="input" name="email" placeholder="Email" [(ngModel)]="newInvite.email" required email />
+        <input class="input" name="note" placeholder="Note (optional)" [(ngModel)]="newInvite.note" />
+        <button class="btn primary" type="submit" [disabled]="saving || !addForm.valid">Add</button>
+      </form>
+    </section>
+
+    <!-- Bulk add -->
+    <section class="eo-section">
+      <h2 class="eo-section-title">Bulk Add</h2>
+      <p class="eo-help">Paste one per line: <code>firstName,email[,note]</code></p>
+      <textarea class="textarea" [(ngModel)]="bulkText" name="bulkText" rows="5" placeholder="Alice,alice@mail.com&#10;Bob,bob@mail.com,vegetarian"></textarea>
+      <div class="row">
+        <button class="btn" (click)="addBulk()" [disabled]="saving || !bulkText.trim()">Import</button>
+      </div>
+    </section>
+
+    <!-- Guest list (editable) -->
+    <section class="eo-section">
+      <h2 class="eo-section-title">Guest List</h2>
+
+      <div class="row space">
+        <label><input type="checkbox" [(ngModel)]="selectAll" name="selectAll" (change)="toggleSelectAll()"> Select all</label>
+       <button class="btn danger" (click)="deleteSelected()" [disabled]="!hasSelected()">Delete selected</button>
+      </div>
+
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th style="width:36px;"><input type="checkbox" [(ngModel)]="selectAll" name="selectAll2" (change)="toggleSelectAll()"></th>
+            <th>First Name</th>
+            <th>Email</th>
+            <th>RSVP</th>
+            <th>Note</th>
+            <th style="width:140px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let g of guests">
+            <td><input type="checkbox" [(ngModel)]="g._selected" name="sel_{{guestEmail(g)}}" /></td>
+
+            <td *ngIf="!g._editing">{{ g.firstName }}</td>
+            <td *ngIf="g._editing"><input class="input" [(ngModel)]="g._draftFirstName" name="fn_{{guestEmail(g)}}" /></td>
+
+            <td>{{ guestEmail(g) }}</td>
+
+            <td>
+              <span class="chip" *ngIf="g.coming === true">Coming</span>
+              <span class="chip warn" *ngIf="g.coming === false">Not Coming</span>
+              <span class="chip muted" *ngIf="g.coming === undefined || g.coming === null">No Response</span>
+            </td>
+
+            <td *ngIf="!g._editing">{{ g.note || '—' }}</td>
+            <td *ngIf="g._editing"><input class="input" [(ngModel)]="g._draftNote" name="nt_{{guestEmail(g)}}" /></td>
+
+            <td class="actions">
+              <ng-container *ngIf="!g._editing; else editingBtns">
+                <button class="link" (click)="startEdit(g)">Edit</button>
+                <button class="link danger" (click)="deleteInvite(g)">Delete</button>
+              </ng-container>
+              <ng-template #editingBtns>
+                <button class="link" (click)="saveEdit(g)">Save</button>
+                <button class="link muted" (click)="cancelEdit(g)">Cancel</button>
+              </ng-template>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </ng-container>
+</div>
