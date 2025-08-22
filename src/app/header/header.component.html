@@ -12,6 +12,7 @@
       <li><a href="#customer-reviews">Our customer</a></li>
       <li><a [routerLink]="['/event-manager']">Your Event</a></li>
        <li><a [routerLink]="['/file-upload']">Upload Your Pictures</a></li>
+       <li><a [routerLink]="['/report-ticket']">Report</a></li>
       <!-- Only show to users with permission above guest -->
       <li *ngIf="hasEventAccess$ | async">
         <a [routerLink]="['/user-events']">Your Events</a>

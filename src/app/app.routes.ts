@@ -12,6 +12,8 @@ import { AdminComponent } from './admin/admin.component';
 import { UserEditorComponent } from './admin/user-editor/user-editor.component';
 import { EventEditorComponent } from './admin/event-editor/event-editor.component';
 import { FileUploadComponent } from './file-upload/file-upload.component';
+import { ReportTicketComponent } from './report-ticket/report-ticket.component';
+import { TicketReplayComponent } from './admin/ticket-replay/ticket-replay.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -23,6 +25,7 @@ export const routes: Routes = [
     { path: 'event-manager/:id', component:EventManagerComponent},
     { path: 'user-events', component:UserEventsComponent},
     { path: 'event-owner/:id', component:EventOwnerComponent},
+    { path: 'report-ticket', component: ReportTicketComponent },
     { path: 'rsvp', loadComponent: () => import('./rsvp/rsvp.component').then(m => m.RsvpComponent) },
      { path: 'file-upload', component:FileUploadComponent},
     {
@@ -33,7 +36,8 @@ export const routes: Routes = [
       { path: 'users/:id', component: UserEditorComponent },
       { path: 'events', component: EventEditorComponent },
       { path: 'events/:id', component: EventEditorComponent },
-      //{ path: 'tickets', component: TicketsPlaceholderComponent }, // ✅ now clickable
+      { path: 'tickets', component: TicketReplayComponent }, 
+      { path: 'tickets/:id',component: TicketReplayComponent },
       { path: '', pathMatch: 'full', redirectTo: 'users' }
     ]
   },

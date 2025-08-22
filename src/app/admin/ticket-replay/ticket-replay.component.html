@@ -1,0 +1,128 @@
+<p>ticket-reply works!</p>
+Q<section class="wrap">
+  <h1>Ticket Reply (Admin)</h1>
+
+  <!-- Alerts -->
+  <div *ngIf="errorMsg" class="alert alert-error">{{ errorMsg }}</div>
+  <div *ngIf="successMsg" class="alert alert-success">{{ successMsg }}</div>
+
+  <!-- Top bar: search + refresh -->
+  <div class="toolbar">
+    <input
+      type="text"
+      placeholder="Search by title, content, status, or ID…"
+      [(ngModel)]="searchTerm"
+      (input)="applyFilter()"
+      [disabled]="loading"
+      aria-label="Search tickets"
+    />
+    <button (click)="loadTickets()" [disabled]="loading">
+      {{ loading ? 'Loading…' : 'Refresh' }}
+    </button>
+  </div>
+
+  <!-- Tickets table -->
+  <div class="table-wrap">
+    <table class="tickets">
+      <thead>
+        <tr>
+          <th style="width: 90px;">ID</th>
+          <th>Title</th>
+          <th style="width: 140px;">Status</th>
+          <th style="width: 160px;">Reporter</th>
+          <th style="width: 160px;">Event</th>
+          <th style="width: 110px;">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="6">Loading tickets…</td>
+        </tr>
+
+        <tr *ngIf="!loading && (!filtered || filtered.length === 0)">
+          <td colspan="6">No tickets found.</td>
+        </tr>
+
+        <tr
+          *ngFor="let t of filtered; trackBy: trackById"
+          [class.active]="selected?.ticketId === t.ticketId"
+        >
+          <td>#{{ t.ticketId }}</td>
+          <td>
+            <div class="title">{{ t.ticketTitle || '-' }}</div>
+            <div class="content-muted">
+              {{ t.ticketContent || '' }}
+            </div>
+          </td>
+          <td>
+            <span class="badge" [attr.data-status]="t.ticketStatus">
+              {{ t.ticketStatus || 'UNKNOWN' }}
+            </span>
+          </td>
+          <td>
+            <!-- Safe optional chaining; adjust keys to your real shape -->
+            {{ t.reporter?.name || t.reporter?.username || t.reporter?.email || '-' }}
+          </td>
+          <td>
+            {{ t.event?.name || t.event?.title || '-' }}
+          </td>
+          <td>
+            <button (click)="selectTicket(t)" [disabled]="saving">
+              {{ selected?.ticketId === t.ticketId ? 'Selected' : 'Select' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Details / editor panel -->
+  <div *ngIf="selected" class="editor">
+    <h2>Editing Ticket #{{ selected.ticketId }}</h2>
+
+    <div class="grid">
+      <div class="field">
+        <label>Title</label>
+        <input type="text" [value]="selected.ticketTitle" readonly />
+      </div>
+
+      <div class="field">
+        <label>Current Status</label>
+        <select
+          [ngModel]="selected.ticketStatus"
+          (ngModelChange)="changeStatus($event)"
+          [disabled]="saving"
+          aria-label="Change status"
+        >
+          <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Content</label>
+      <textarea [value]="selected.ticketContent" rows="4" readonly></textarea>
+    </div>
+
+    <div class="field">
+      <label>Reply to user</label>
+      <textarea
+        [(ngModel)]="replyText"
+        rows="4"
+        placeholder="Write your reply to the reporter…"
+        [disabled]="saving"
+      ></textarea>
+      <div class="actions">
+        <button (click)="sendReply()" [disabled]="saving || !(replyText && replyText.trim())">
+          {{ saving ? 'Sending…' : 'Send Reply' }}
+        </button>
+        <button class="ghost" (click)="cancelSelection()" [disabled]="saving">
+          Cancel
+        </button>
+      </div>
+    </div>
+
+   
+  </div>
+</section>
