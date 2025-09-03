@@ -10,9 +10,13 @@
       <li><a href="#about-us">About Us</a></li>
       <li><a href="#why-choose-us">Why Choose US</a></li>
       <li><a href="#customer-reviews">Our customer</a></li>
-      <li><a [routerLink]="['/event-manager']">Your Event</a></li>
-       <li><a [routerLink]="['/file-upload']">Upload Your Pictures</a></li>
-       <li><a [routerLink]="['/report-ticket']">Report</a></li>
+      <ng-container *ngIf="isLoggedIn$ | async">
+        
+        <li><a [routerLink]="['/my-invitations']">My Invitations</a></li>
+        <li><a [routerLink]="['/subscribe']">Sub</a></li>
+        <li><a [routerLink]="['/report-ticket']">Report</a></li>
+  </ng-container>
+       
       <!-- Only show to users with permission above guest -->
       <li *ngIf="hasEventAccess$ | async">
         <a [routerLink]="['/user-events']">Your Events</a>

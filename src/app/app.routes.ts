@@ -11,9 +11,15 @@ import { EventOwnerComponent } from './event-owner/event-owner.component';
 import { AdminComponent } from './admin/admin.component';
 import { UserEditorComponent } from './admin/user-editor/user-editor.component';
 import { EventEditorComponent } from './admin/event-editor/event-editor.component';
-import { FileUploadComponent } from './file-upload/file-upload.component';
+import { FileUploadComponent } from './invited-event/file-upload/file-upload.component';
 import { ReportTicketComponent } from './report-ticket/report-ticket.component';
 import { TicketReplayComponent } from './admin/ticket-replay/ticket-replay.component';
+import { SubscribeComponent } from './subscribe/subscribe.component';
+import { PaymentComponent } from './payment/payment.component';
+import { MyInvitationsComponent } from './my-invitations/my-invitations.component';
+import { InvitedEventComponent } from './invited-event/invited-event.component';
+import { InvitedEventDetailsComponent } from './invited-event/invited-event-details/invited-event-details.component';
+import { InvitedEventReportComponent } from './invited-event/invited-event-report/invited-event-report.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -26,8 +32,10 @@ export const routes: Routes = [
     { path: 'user-events', component:UserEventsComponent},
     { path: 'event-owner/:id', component:EventOwnerComponent},
     { path: 'report-ticket', component: ReportTicketComponent },
+    { path: 'subscribe', component: SubscribeComponent},
+    { path: 'payment', component: PaymentComponent},
+    { path: "my-invitations", component :MyInvitationsComponent},
     { path: 'rsvp', loadComponent: () => import('./rsvp/rsvp.component').then(m => m.RsvpComponent) },
-     { path: 'file-upload', component:FileUploadComponent},
     {
     path: 'admin',
     component: AdminComponent,
@@ -40,6 +48,16 @@ export const routes: Routes = [
       { path: 'tickets/:id',component: TicketReplayComponent },
       { path: '', pathMatch: 'full', redirectTo: 'users' }
     ]
+  },
+  {
+     path: 'invited-event/:id',
+  component: InvitedEventComponent,
+  children: [
+    { path: '', pathMatch: 'full', redirectTo: 'details' }, 
+    { path: 'details', component: InvitedEventDetailsComponent },
+    { path: 'upload', component:FileUploadComponent },
+    { path: 'report', component: InvitedEventReportComponent } 
+  ]
   },
     { path: '**', component: PageNotFoundComponent },
 ];

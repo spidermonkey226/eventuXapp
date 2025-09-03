@@ -1,1 +1,85 @@
-<p>report-ticket works!</p>
+<section class="wrap">
+  <h1>Report a Ticket</h1>
+
+  <p class="ok" *ngIf="successMsg">{{ successMsg }}</p>
+  <p class="err" *ngIf="errorMsg">{{ errorMsg }}</p>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <!-- Title -->
+    <div class="field">
+      <label for="title">Title</label>
+      <input id="title" type="text" formControlName="ticketTitle" />
+      <small class="err" *ngIf="f['ticketTitle'].touched && f['ticketTitle'].errors">
+        <span *ngIf="f['ticketTitle'].errors['required']">Title is required.</span>
+        <span *ngIf="f['ticketTitle'].errors['minlength']">Min 3 characters.</span>
+      </small>
+    </div>
+
+    <!-- Description -->
+    <div class="field">
+      <label for="content">Description</label>
+      <textarea id="content" rows="6" formControlName="ticketContent"></textarea>
+      <small class="err" *ngIf="f['ticketContent'].touched && f['ticketContent'].errors">
+        <span *ngIf="f['ticketContent'].errors['required']">Description is required.</span>
+        <span *ngIf="f['ticketContent'].errors['minlength']">Min 10 characters.</span>
+      </small>
+    </div>
+
+    <!-- Optional fields -->
+    <div class="row">
+      <div class="field">
+        <label for="reporter">Reporter (optional)</label>
+        <input id="reporter" type="text" formControlName="reporter" />
+      </div>
+      <div class="field">
+        <label for="event">Event (optional)</label>
+        <input id="event" type="text" formControlName="event" />
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="submitting">
+      {{ submitting ? 'Sending…' : 'Send' }}
+    </button>
+  </form>
+
+  <!-- Ticket history for this user -->
+  <section class="history" *ngIf="myTickets.length">
+    <h2>Your Tickets</h2>
+    <ul>
+      <li *ngFor="let t of myTickets">
+        <span class="badge" [ngClass]="(t.ticketStatus || '').toLowerCase()">
+        {{ t.ticketStatus || 'UNKNOWN' }}
+</span>
+        <strong>{{ t.ticketTitle }}</strong>
+        <small> · #{{ t.ticketId }}</small>
+
+        <button class="link" (click)="toggleThread(t.ticketId)">View conversation</button>
+
+        <div class="thread" *ngIf="openThreadId === t.ticketId">
+          <ul>
+            <li *ngFor="let m of (messages[t.ticketId] || [])">
+              <b>{{ m.sender === 'admin' ? 'Admin' : 'You' }}:</b>
+              {{ m.text }}
+              <small> · {{ m.at }}</small>
+            </li>
+          </ul>
+
+          <!-- Reply only when status is OPEN -->
+          <div class="reply" *ngIf="t.ticketStatus === 'OPEN'; else locked">
+            <input
+              type="text"
+              placeholder="Write a reply…"
+              [(ngModel)]="drafts[t.ticketId]"
+            />
+           <button (click)="sendReply(t.ticketId)" [disabled]="sending || !(drafts[t.ticketId] && drafts[t.ticketId].trim())">
+            {{ sending ? 'Sending…' : 'Reply' }}
+            </button>
+          </div>
+          <ng-template #locked>
+            <div class="note">This ticket is {{ t.ticketStatus }} — replies are disabled.</div>
+          </ng-template>
+        </div>
+      </li>
+    </ul>
+  </section>
+</section>

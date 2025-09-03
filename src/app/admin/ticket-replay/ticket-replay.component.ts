@@ -13,6 +13,7 @@ import { BrowserModule } from '@angular/platform-browser';
   styleUrl: './ticket-replay.component.css'
 })
 export class TicketReplayComponent implements OnInit{
+  
   tickets: Ticket[] = [];
   filtered: Ticket[] = [];
 

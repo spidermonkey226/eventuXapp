@@ -1,7 +1,35 @@
+<p>file-upload works!</p>
+<!-- src/app/file-upload/file-upload.component.html -->
 <section class="upload-card">
   <h1 class="title">File upload</h1>
 
-  <form (submit)="onSubmit($event)">
+  <!-- Event context info / errors -->
+  <p class="msg err" *ngIf="listError">{{ listError }}</p>
+
+  <!-- Existing files -->
+  <div class="selected" *ngIf="!listError">
+    <h2>Existing files</h2>
+
+    <div *ngIf="loadingList" class="state loading">
+      <div class="spinner" aria-hidden="true"></div><span>Loading…</span>
+    </div>
+
+    <ul *ngIf="!loadingList">
+      <li *ngFor="let f of existingFiles">
+        <div class="file-row">
+          <div class="meta">
+            <strong>{{ f.name }}</strong>
+            <small *ngIf="f.type || f.size">{{ (f.type || 'Unknown type') }}<ng-container *ngIf="f.size"> • {{ f.size }}</ng-container></small>
+          </div>
+          <button type="button" class="remove" (click)="deleteServerFile(f.id)">Delete</button>
+        </div>
+      </li>
+      <li *ngIf="existingFiles.length === 0" class="muted">No files yet.</li>
+    </ul>
+  </div>
+
+  <!-- Upload new -->
+  <form (submit)="onSubmit($event)" *ngIf="!listError">
     <label class="file-picker" for="fileInput">
       <input
         id="fileInput"

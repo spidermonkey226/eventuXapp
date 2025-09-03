@@ -1,0 +1,23 @@
+<div *ngIf="loading" class="state loading"><div class="spinner"></div><span>Loading…</span></div>
+<div *ngIf="!loading && error" class="state error">{{ error }}</div>
+
+<div *ngIf="!loading && !error && event" class="card">
+  <h2 class="title">{{ event.eventName || 'Event' }}</h2>
+
+  <div class="row">
+    <div class="label">Date</div>
+    <div class="value">{{ event.eventDate | date: 'EEE, MMM d, y' }}</div>
+  </div>
+
+  <div class="row" *ngIf="event.address?.city">
+    <div class="label">City</div>
+    <div class="value">{{ event.address?.city }}</div>
+  </div>
+
+  <div class="row" *ngIf="event.address?.streetName || event.address?.streetNumber">
+    <div class="label">Address</div>
+    <div class="value">
+      {{ event.address?.streetName || '' }} <ng-container *ngIf="event.address?.streetNumber"> {{ event.address?.streetNumber }}</ng-container>
+    </div>
+  </div>
+</div>

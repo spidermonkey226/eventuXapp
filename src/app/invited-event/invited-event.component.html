@@ -1,0 +1,23 @@
+<div class="layout">
+  <aside class="sidebar">
+    <div class="event-head">
+      <div class="title" [title]="eventName()">{{ eventName() }}</div>
+      <div class="date" *ngIf="eventDate()">{{ eventDate() | date: 'EEE, MMM d, y' }}</div>
+    </div>
+
+    <nav class="nav">
+      <a [routerLink]="['details']" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Event details</a>
+      <a [routerLink]="['upload']" routerLinkActive="active">Upload photos</a>
+      <a [routerLink]="['report']" routerLinkActive="active">Report</a>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <div *ngIf="loading" class="state loading">
+      <div class="spinner" aria-hidden="true"></div><span>Loading…</span>
+    </div>
+    <div *ngIf="!loading && error" class="state error">{{ error }}</div>
+
+    <router-outlet *ngIf="!loading && !error"></router-outlet>
+  </main>
+</div>

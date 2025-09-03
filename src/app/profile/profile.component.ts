@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import { User } from '../class/user';
+import { SubscriptionLevel } from '../class/user';
 
 @Component({
   selector: 'app-profile',
@@ -14,14 +15,33 @@ import { User } from '../class/user';
 export class ProfileComponent implements OnInit {
   private users = inject(UserService);
 
+  SubscriptionLevel = SubscriptionLevel;
+
   user: any | null = null;
   editMode = false;
   profileImageUrl: string | null = null;
   defaultImage = 'assets/default-profile.png';
   selectedFile: File | null = null; 
 
+   readonly subLabels: Record<number, string> = {
+    [SubscriptionLevel.Free]: 'Free',
+    [SubscriptionLevel.Basic]: 'Basic',
+    [SubscriptionLevel.Standard]: 'Standard',
+    [SubscriptionLevel.Pro]: 'Pro',
+    [SubscriptionLevel.Ultimate]: 'Ultimate'
+  };
+
+  // map enum -> max events
+  readonly subMaxEvents: Record<number, number> = {
+    [SubscriptionLevel.Free]: 5,
+    [SubscriptionLevel.Basic]: 20,
+    [SubscriptionLevel.Standard]: 50,
+    [SubscriptionLevel.Pro]: 200,
+    [SubscriptionLevel.Ultimate]: -1
+  };
+
   // separate form model so we don't mutate `user` until Save
-  formModel: any = {
+ formModel: any = {
     firstName: '', lastName: '', email: '', phone: '',
     newPassword: '', confirmPassword: ''
   };
@@ -124,5 +144,23 @@ export class ProfileComponent implements OnInit {
     const reader = new FileReader();
     reader.onload = () => (this.profileImageUrl = reader.result as string);
     reader.readAsDataURL(file);
+  }
+
+  getSubscriptionName(level: number | undefined | null): string {
+    if (level === undefined || level === null) return '-';
+    return this.subLabels[level] ?? '-';
+  }
+
+  toDate(d: string | Date | null | undefined): Date | null {
+    if (!d) return null;
+    if (d instanceof Date) return d;
+    // Backend sends LocalDate (no time) → make it a safe ISO Date
+    return new Date(`${d}T00:00:00`);
+  }
+
+   getMaxEvents(level: number | undefined | null): string {
+    if (level === undefined || level === null) return '-';
+    const n = this.subMaxEvents[level];
+    return n === -1 ? 'Unlimited' : String(n);
   }
 }

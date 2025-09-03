@@ -1,0 +1,24 @@
+.layout { 
+    display: grid; 
+    grid-template-columns: 260px 1fr; 
+    min-height: calc(100vh - 80px);
+    margin-top: 70px; 
+}
+.sidebar { border-right: 1px solid #e5e7eb; padding: 16px; background: #fafafa; }
+.event-head .title { font-weight: 700; font-size: 18px; line-height: 1.2; }
+.event-head .date { color: #6b7280; margin-top: 4px; }
+
+.nav { display: flex; flex-direction: column; gap: 8px; margin-top: 16px; }
+.nav a { padding: 8px 10px; border-radius: 8px; color: #111827; text-decoration: none; }
+.nav a.active, .nav a:hover { background: #eef2ff; color: #1e40af; }
+
+.content { padding: 20px; }
+.state.loading { display: flex; align-items: center; gap: 10px; }
+.spinner { width: 18px; height: 18px; border: 3px solid #e5e7eb; border-top-color: #6d28d9; border-radius: 50%; animation: spin .8s linear infinite; }
+.state.error { color: #b91c1c; background: #fee2e2; border: 1px solid #fecaca; padding: 10px 12px; border-radius: 10px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { border-right: 0; border-bottom: 1px solid #e5e7eb; }
+}

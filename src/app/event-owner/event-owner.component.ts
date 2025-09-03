@@ -75,8 +75,8 @@ export class EventOwnerComponent implements OnInit {
           this.eventId = id;
           return forkJoin({
             event: this.eventService.getById(id),
-            guests: this.invitedService.getByEventId(id), // InvitedDTO[]
-            files: this.eventService.getFiles(id)          // [{id,name}]
+            guests: this.invitedService.getByEventId(id),
+            files: this.eventService.getFiles(id)
           });
         })
       )
@@ -85,20 +85,20 @@ export class EventOwnerComponent implements OnInit {
           this.event = event;
 
           const toRow = (g: InvitedDTO | any): EditableInvited => ({
-          id: { eventId: g.eventId ?? g.id?.eventId, email: g.email ?? g.id?.email },
-          firstName: g.firstName ?? '',
-          note: g.note ?? undefined,      // convert null → undefined
-          coming: g.coming ?? null,
-          _editing: false,
-          _selected: false
-        });
-          this.guests = (guests ?? []).map(toRow);
+            id: { eventId: g.eventId ?? g.id?.eventId, email: g.email ?? g.id?.email },
+            firstName: g.firstName ?? '',
+            note: g.note ?? undefined,
+            coming: g.coming ?? null,
+            _editing: false,
+            _selected: false
+          });
 
+          this.guests = (guests ?? []).map(toRow);
           this.files = files ?? [];
           this.computeStats();
           this.loading = false;
         },
-        error: (err) => {
+        error: (err: any) => { // <-- type it
           this.error = err?.error?.message || err?.message || 'Failed to load event owner data';
           this.loading = false;
         }
@@ -225,30 +225,24 @@ forkJoin(creations).subscribe({
     g._editing = false;
   }
   saveEdit(g: EditableInvited) {
-  // Build exactly what InvitedService.update expects (no `null` in `note`)
-  const upd: { eventId: number; email: string; firstName?: string; note?: string } = {
-    eventId: this.eventId,
-    email: this.guestEmail(g),
-    firstName: g._draftFirstName?.trim() || undefined,
-    note: g._draftNote?.trim() || undefined,   // normalize to undefined, never null
-  };
+    const upd = {
+      eventId: this.eventId,
+      email: this.guestEmail(g),
+      firstName: g._draftFirstName?.trim() || undefined,
+      note: g._draftNote?.trim() || undefined,
+    };
 
-  this.invitedService.update(upd).subscribe({
-    next: (saved: Partial<InvitedDTO>) => {
-      // firstName: use server value if present, otherwise what we sent, fallback to ''
-      g.firstName = (saved.firstName ?? upd.firstName) ?? '';
-
-      // note: explicitly normalize null -> undefined to satisfy EditableInvited
-      const newNote: string | undefined = saved.note == null ? upd.note : saved.note;
-      g.note = newNote;
-
-      g._editing = false;
-    },
-    error: (err) => {
-      this.error = err?.error?.message || 'Failed to save invite';
-    }
-  });
-}
+    this.invitedService.update(upd).subscribe({
+      next: (saved: { firstName?: string; note?: string }) => {  // <-- reflect update() return type
+        g.firstName = (saved.firstName ?? upd.firstName) ?? '';
+        g.note = saved.note == null ? upd.note : saved.note;     // normalize null → undefined
+        g._editing = false;
+      },
+      error: (err: any) => {                                     // <-- type it
+        this.error = err?.error?.message || 'Failed to save invite';
+      }
+    });
+  }
 
   // ---------- Delete one ----------
   deleteInvite(g: EditableInvited) {

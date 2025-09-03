@@ -1,0 +1,64 @@
+<section class="wrap">
+  <header class="header">
+    <h1>My Invitations</h1>
+    <p *ngIf="email" class="sub">Invitations for <span class="email">{{ email }}</span></p>
+  </header>
+
+  <!-- Not signed in -->
+  <div *ngIf="!loading && notLoggedIn" class="state empty">
+    <h3>Please sign in to view your invitations</h3>
+    <button type="button" class="btn" (click)="goSignIn()">Sign in</button>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="state loading">
+    <div class="spinner" aria-hidden="true"></div>
+    <span>Loading…</span>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="!loading && error" class="state error" role="alert">
+    {{ error }}
+  </div>
+
+  <!-- Empty for this user -->
+  <div *ngIf="!loading && !error && !notLoggedIn && items.length === 0" class="state empty">
+    <h3>No invitations found for <span class="email">{{ email }}</span></h3>
+    <p>When someone invites this email to an event, it will appear here.</p>
+  </div>
+
+  <!-- List -->
+  <ul *ngIf="!loading && !error && !notLoggedIn && items.length > 0" class="cards">
+    <li *ngFor="let it of items" class="card" tabindex="0"
+        (click)="openEvent(it.event.eventID || it.event.eventId || it.event.id)"
+        (keyup.enter)="openEvent(it.event.eventID || it.event.eventId || it.event.id)">
+      <div class="content">
+        <div class="row">
+          <h2 class="title">{{ it.event.eventName || 'Untitled Event' }}</h2>
+          <span class="{{ statusClass(it.invited.coming) }}">{{ statusLabel(it.invited.coming) }}</span>
+        </div>
+
+        <div class="meta">
+          <div class="meta-item" *ngIf="it.event.eventDate">
+            <span class="icon">📅</span>
+            <span>{{ it.event.eventDate | date: 'EEE, MMM d, y' }}</span>
+          </div>
+          <div class="meta-item" *ngIf="it.event.address?.city">
+            <span class="icon">📍</span>
+            <span>{{ it.event.address?.city }}</span>
+          </div>
+          <div class="meta-item" *ngIf="it.invited.firstName">
+            <span class="icon">🧑</span>
+            <span>Invite for {{ it.invited.firstName }}</span>
+          </div>
+        </div>
+
+        <p class="desc" *ngIf="it.event.comments">{{ it.event.comments }}</p>
+
+        <div class="foot">
+          <button type="button" class="open">Open event</button>
+        </div>
+      </div>
+    </li>
+  </ul>
+</section>

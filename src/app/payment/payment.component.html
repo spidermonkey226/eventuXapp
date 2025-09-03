@@ -1,0 +1,78 @@
+<section class="wrap">
+  <h1>Payment</h1>
+
+  <form [formGroup]="form" (ngSubmit)="pay()">
+    <!-- Card Number -->
+    <div class="field">
+      <label>Card Number</label>
+      <input
+        formControlName="cardNumber"
+        placeholder="1234 5678 9012 3456"
+        inputmode="numeric"
+        autocomplete="cc-number"
+        (input)="onCardNumberInput($event)"
+        (blur)="fc.cardNumber.markAsTouched()"
+      />
+      <span class="msg error" *ngIf="(fc.cardNumber.touched || fc.cardNumber.dirty) && fc.cardNumber.invalid">
+        <ng-container *ngIf="fc.cardNumber.errors?.['required']">Card number is required.</ng-container>
+        <ng-container *ngIf="fc.cardNumber.errors?.['digitsOnly']">Use digits only.</ng-container>
+        <ng-container *ngIf="fc.cardNumber.errors?.['exact16']">Must be exactly 16 digits.</ng-container>
+        <ng-container *ngIf="fc.cardNumber.errors?.['luhn']">Invalid card number.</ng-container>
+      </span>
+    </div>
+
+    <!-- Expiry -->
+    <div class="field">
+      <label>Expiry</label>
+      <input
+        formControlName="expiry"
+        placeholder="MM/YY"
+        inputmode="numeric"
+        autocomplete="cc-exp"
+        (input)="onExpiryInput($event)"
+        (blur)="fc.expiry.markAsTouched()"
+      />
+      <span class="msg error" *ngIf="(fc.expiry.touched || fc.expiry.dirty) && fc.expiry.invalid">
+        <ng-container *ngIf="fc.expiry.errors?.['required']">Expiry date is required.</ng-container>
+        <ng-container *ngIf="fc.expiry.errors?.['pattern']">Please use format MM/YY.</ng-container>
+        <ng-container *ngIf="fc.expiry.errors?.['expiryPast']">This card is expired.</ng-container>
+      </span>
+    </div>
+
+    <!-- CVV -->
+    <div class="field">
+      <label>CVV</label>
+      <input
+        formControlName="cvv"
+        placeholder="123"
+        type="password"
+        inputmode="numeric"
+        autocomplete="cc-csc"
+        (blur)="fc.cvv.markAsTouched()"
+      />
+      <span class="msg error" *ngIf="(fc.cvv.touched || fc.cvv.dirty) && fc.cvv.invalid">
+        <ng-container *ngIf="fc.cvv.errors?.['required']">CVV is required.</ng-container>
+        <ng-container *ngIf="fc.cvv.errors?.['pattern']">CVV must be 3–4 digits.</ng-container>
+      </span>
+    </div>
+
+    <!-- Name -->
+    <div class="field">
+      <label>Name on Card</label>
+      <input
+        formControlName="name"
+        placeholder="John Doe"
+        autocomplete="cc-name"
+        (blur)="fc.name.markAsTouched()"
+      />
+      <span class="msg error" *ngIf="(fc.name.touched || fc.name.dirty) && fc.name.invalid">
+        Name is required.
+      </span>
+    </div>
+
+    <button type="submit" [disabled]="form.invalid">Pay</button>
+  </form>
+
+  <p class="msg success" *ngIf="successMsg">{{ successMsg }}</p>
+  <p class="msg error" *ngIf="errorMsg">{{ errorMsg }}</p>
+</section>

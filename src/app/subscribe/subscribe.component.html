@@ -1,0 +1,77 @@
+<section class="wrap" *ngIf="!loading; else spinner">
+  <h1>Choose your plan</h1>
+
+  <!-- Current subscription banner -->
+  <div class="current" *ngIf="currentUser as u">
+    <div class="row">
+      <div class="plan">
+        <strong>Current plan:</strong>
+        <span class="pill">{{ planName(u.subscriptionLevel) }}</span>
+      </div>
+
+      <div class="expiry">
+        <strong>Ends:</strong>
+        <span>{{ endDateText() }}</span>
+        <ng-container *ngIf="daysLeft() !== null">
+          <span class="muted">• {{ daysLeft() }} day{{ daysLeft()! === 1 ? '' : 's' }} left</span>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plans grid -->
+  <div class="grid">
+    <div class="card" *ngFor="let p of plans">
+      <div class="card-header">
+        <h2>{{ p.name }}</h2>
+        <span class="badge" *ngIf="p.name === 'STANDARD'">Most popular</span>
+        <span class="badge accent" *ngIf="p.name === 'ULTIMATE'">Best value</span>
+      </div>
+
+      <p class="subtitle">{{ planSubtitle(p) }}</p>
+
+      <ul class="features">
+        <li *ngIf="p.name === 'BASIC'">
+          <strong>Invite up to 20 people</strong> per event • great for first launches
+        </li>
+        <li *ngIf="p.name === 'STANDARD'">
+          <strong>Invite up to 50 people</strong> • grow your community with RSVP tracking
+        </li>
+        <li *ngIf="p.name === 'PRO'">
+          <strong>Invite 200+</strong> • advanced tools & priority support
+        </li>
+        <li *ngIf="p.name === 'ULTIMATE'">
+          <strong>Unlimited invites</strong> • lift every cap and scale freely
+        </li>
+
+        <!-- common perks -->
+        <li>Beautiful event pages</li>
+        <li>One-click share links</li>
+        <li>Email reminders</li>
+      </ul>
+
+      <button (click)="selectPlan(p)">Choose {{ p.name }}</button>
+    </div>
+  </div>
+
+  <div class="msg success" *ngIf="successMsg">{{ successMsg }}</div>
+  <div class="msg error" *ngIf="errorMsg">{{ errorMsg }}</div>
+</section>
+
+<ng-template #spinner>
+  <div class="loading">Loading plans…</div>
+</ng-template>
+
+<!-- confirm bar -->
+<div class="confirm" *ngIf="selecting as s">
+  <div>
+    <strong>Confirm {{ s.name }}</strong>
+    <div class="sub">
+      This will start immediately{{ s.name !== 'ULTIMATE' ? ' for 30 days' : '' }}.
+    </div>
+  </div>
+  <div class="actions">
+    <button class="ghost" (click)="cancel()">Cancel</button>
+    <button (click)="confirm()">Confirm</button>
+  </div>
+</div>

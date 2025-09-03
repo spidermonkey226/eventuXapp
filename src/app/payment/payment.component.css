@@ -1,0 +1,39 @@
+.wrap { 
+  max-width: 500px;
+  margin: 24px auto; 
+  padding: 16px; 
+  margin-top: 100px;
+}
+.field { 
+  margin-bottom: 12px;
+  display: flex; 
+  flex-direction: column;
+}
+label { 
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+input {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 8px;
+}
+button {
+  background: #111827;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+button:hover { 
+  opacity: 0.9; 
+}
+.msg.success { 
+  color: #065f46; 
+  margin-top: 12px; 
+}
+.msg.error { 
+  color: #991b1b; 
+  margin-top: 12px; 
+}

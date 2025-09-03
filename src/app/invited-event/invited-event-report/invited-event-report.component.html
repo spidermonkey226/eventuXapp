@@ -1,0 +1,41 @@
+<section class="wrap">
+  <header class="head">
+    <h1>Report an issue with this event</h1>
+    <div class="sub" *ngIf="event">
+      <b>{{ event.eventName || 'Event' }}</b>
+      <span *ngIf="event.eventDate"> · {{ event.eventDate | date:'EEE, MMM d, y' }}</span>
+      <span *ngIf="event.address?.city"> · {{ event.address?.city }}</span>
+    </div>
+  </header>
+
+  <p class="ok" *ngIf="successMsg">{{ successMsg }}</p>
+  <p class="err" *ngIf="errorMsg">{{ errorMsg }}</p>
+
+  <div *ngIf="loadingEvent" class="state loading">
+    <div class="spinner" aria-hidden="true"></div><span>Loading event…</span>
+  </div>
+
+  <form *ngIf="!loadingEvent && !errorMsg" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    <div class="field">
+      <label>Title</label>
+      <input type="text" formControlName="ticketTitle" />
+      <small class="err" *ngIf="f['ticketTitle'].touched && f['ticketTitle'].errors">
+        <span *ngIf="f['ticketTitle'].errors['required']">Title is required.</span>
+        <span *ngIf="f['ticketTitle'].errors['minlength']">Min 3 characters.</span>
+      </small>
+    </div>
+
+    <div class="field">
+      <label>Description</label>
+      <textarea rows="6" formControlName="ticketContent"></textarea>
+      <small class="err" *ngIf="f['ticketContent'].touched && f['ticketContent'].errors">
+        <span *ngIf="f['ticketContent'].errors['required']">Description is required.</span>
+        <span *ngIf="f['ticketContent'].errors['minlength']">Min 10 characters.</span>
+      </small>
+    </div>
+
+    <button type="submit" [disabled]="submitting">
+      {{ submitting ? 'Sending…' : 'Send to event owner' }}
+    </button>
+  </form>
+</section>

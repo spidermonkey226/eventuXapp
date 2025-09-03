@@ -34,6 +34,19 @@
       <div class="row"><span class="label">Email</span><span class="value">{{ u.email }}</span></div>
       <div class="row"><span class="label">Phone</span><span class="value">{{ u.phone }}</span></div>
       <div class="row"><span class="label">Permission</span><span class="value">{{ u.permision?.permisionName || '—' }}</span></div>
+      <div class="row">
+  <span class="label">Subscription</span>
+  <span class="value">
+    {{ getSubscriptionName(u.subscriptionLevel) }}
+    · Max events: {{ getMaxEvents(u.subscriptionLevel) }}
+    <ng-container *ngIf="u.subscriptionStart">
+      · starts {{ toDate(u.subscriptionStart) | date:'mediumDate' }}
+    </ng-container>
+    <ng-container *ngIf="u.subscriptionEnd">
+      · ends {{ toDate(u.subscriptionEnd) | date:'mediumDate' }}
+    </ng-container>
+  </span>
+</div>
     </div>
 
     <!-- EDIT MODE -->

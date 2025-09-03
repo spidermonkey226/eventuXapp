@@ -1,0 +1,65 @@
+/* src/app/features/invitations/my-invitations/my-invitations.component.css */
+.wrap { 
+    max-width: 960px; 
+    margin: 0 auto; 
+    padding: 24px;
+    margin-top: 100px;
+}
+
+.header h1 { margin: 0; font-size: 28px; font-weight: 700; }
+.header .sub { color: #6b7280; margin-top: 4px; }
+
+.email-form { display: flex; gap: 10px; margin-top: 16px; }
+.email-form input {
+  flex: 1; padding: 10px 12px; border-radius: 10px;
+  border: 1px solid #e5e7eb; outline: none;
+}
+.email-form button {
+  padding: 10px 14px; border-radius: 10px; border: 0; background: #6d28d9; color: #fff;
+  cursor: pointer;
+}
+.hint { color: #6b7280; margin-top: 6px; font-size: 13px; }
+
+.state { margin-top: 24px; display: flex; align-items: center; gap: 10px; }
+.state.loading .spinner {
+  width: 18px; height: 18px; border: 3px solid #e5e7eb; border-top-color: #6d28d9;
+  border-radius: 50%; animation: spin .8s linear infinite;
+}
+.state.error { color: #b91c1c; background: #fee2e2; border: 1px solid #fecaca; padding: 12px 14px; border-radius: 10px; }
+.state.empty { display: block; color: #6b7280; }
+.state.empty .email { font-weight: 600; color: #374151; }
+
+.cards {
+  list-style: none; padding: 0; margin: 20px 0 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px;
+}
+.card {
+  background: #fff; border: 1px solid #f1f5f9; border-radius: 16px; overflow: hidden;
+  box-shadow: 0 2px 10px rgba(17,24,39,.06); transition: transform 120ms ease, box-shadow 120ms ease;
+  cursor: pointer; outline: none;
+}
+.card:focus, .card:hover { transform: translateY(-2px); box-shadow: 0 8px 26px rgba(17,24,39,.12); }
+
+.content { padding: 14px 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+
+.row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.title { font-size: 18px; margin: 0; flex: 1; }
+
+.meta { display: grid; grid-template-columns: 1fr; gap: 6px; color: #6b7280; font-size: 14px; }
+.meta .icon { width: 18px; display: inline-block; }
+
+.desc { color: #374151; font-size: 14px; margin: 4px 0 0;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+
+.foot { display: flex; justify-content: flex-end; }
+.foot .open { border: 1px solid #e5e7eb; background: #fff; border-radius: 10px; padding: 8px 12px; }
+
+.status {
+  border-radius: 9999px; padding: 4px 10px; font-size: 12px; text-transform: capitalize;
+  border: 1px solid transparent;
+}
+.status.accepted { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+.status.declined { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+.status.pending { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
