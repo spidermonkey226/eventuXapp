@@ -71,19 +71,23 @@ export class TicketReplayComponent implements OnInit{
   }
 
   applyFilter(): void {
-    const q = this.searchTerm.trim().toLowerCase();
-    if (!q) {
-      this.filtered = [...this.tickets];
-      return;
-    }
-    this.filtered = this.tickets.filter(t =>
-      (t.ticketTitle?.toLowerCase().includes(q)) ||
-      (t.ticketContent?.toLowerCase().includes(q)) ||
-      (t.ticketStatus?.toLowerCase().includes(q)) ||
-      (String(t.ticketId).includes(q))
-    );
-  }
+  const q = this.searchTerm.trim().toLowerCase();
+  if (!q) { this.filtered = [...this.tickets]; return; }
 
+  this.filtered = this.tickets.filter((t: any) => {
+    const title   = (t.ticketTitle   || '').toLowerCase();
+    const content = (t.ticketContent || '').toLowerCase();
+    const status  = (t.ticketStatus  || '').toLowerCase();
+    const idStr   = String(t.ticketId || '');
+    const reporterEmail = (t.reporterEmail || '').toLowerCase();
+
+    return title.includes(q)
+        || content.includes(q)
+        || status.includes(q)
+        || idStr.includes(q)
+        || reporterEmail.includes(q);
+  });
+}
   // --- Selection ---
   selectTicket(ticket: Ticket): void {
     this.selected = { ...ticket };

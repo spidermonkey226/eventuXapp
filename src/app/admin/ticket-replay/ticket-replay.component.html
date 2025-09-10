@@ -61,9 +61,9 @@
             </span>
           </td>
           <td>
-            <!-- Safe optional chaining; adjust keys to your real shape -->
-            {{ t.reporter?.name || t.reporter?.username || t.reporter?.email || '-' }}
+            {{ $any(t).reporterEmail || t.reporter?.name || t.reporter?.username || t.reporter?.email || '-' }}
           </td>
+
           <td>
             {{ t.event?.name || t.event?.title || '-' }}
           </td>
@@ -85,6 +85,10 @@
     <div class="field">
       <label>Title</label>
       <input type="text" [(ngModel)]="selected.ticketTitle" />
+    </div>
+    <div class="field">
+      <label>Reporter</label>
+      <input type="text" [value]="$any(selected).reporterEmail || '-'" readonly />
     </div>
 
     <div class="field">

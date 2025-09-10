@@ -174,6 +174,12 @@ submit(): void {
   }
 
   sendMessage(ticketId: number): void {
+     const t = this.myTickets.find(x => x.ticketId === ticketId);
+    if (t && t.ticketStatus === 'CLOSED') {
+      alert('This conversation is closed. You can’t send new messages.');
+      return;
+    }
+
     const text = (this.drafts[ticketId] || '').trim();
     if (!text) return;
 
