@@ -1,85 +1,105 @@
 <section class="wrap">
-  <h1>Report a Ticket</h1>
+  <h1>Report a problem with the app</h1>
 
   <p class="ok" *ngIf="successMsg">{{ successMsg }}</p>
   <p class="err" *ngIf="errorMsg">{{ errorMsg }}</p>
 
+  <!-- Create new report -->
   <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
-    <!-- Title -->
     <div class="field">
-      <label for="title">Title</label>
-      <input id="title" type="text" formControlName="ticketTitle" />
+      <label>Title</label>
+      <input type="text" formControlName="ticketTitle" />
       <small class="err" *ngIf="f['ticketTitle'].touched && f['ticketTitle'].errors">
         <span *ngIf="f['ticketTitle'].errors['required']">Title is required.</span>
         <span *ngIf="f['ticketTitle'].errors['minlength']">Min 3 characters.</span>
       </small>
     </div>
 
-    <!-- Description -->
     <div class="field">
-      <label for="content">Description</label>
-      <textarea id="content" rows="6" formControlName="ticketContent"></textarea>
+      <label>Description</label>
+      <textarea rows="6" formControlName="ticketContent"></textarea>
       <small class="err" *ngIf="f['ticketContent'].touched && f['ticketContent'].errors">
         <span *ngIf="f['ticketContent'].errors['required']">Description is required.</span>
         <span *ngIf="f['ticketContent'].errors['minlength']">Min 10 characters.</span>
       </small>
     </div>
 
-    <!-- Optional fields -->
-    <div class="row">
-      <div class="field">
-        <label for="reporter">Reporter (optional)</label>
-        <input id="reporter" type="text" formControlName="reporter" />
-      </div>
-      <div class="field">
-        <label for="event">Event (optional)</label>
-        <input id="event" type="text" formControlName="event" />
-      </div>
-    </div>
-
     <button type="submit" [disabled]="submitting">
-      {{ submitting ? 'Sending…' : 'Send' }}
+      {{ submitting ? 'Sending…' : 'Send to support' }}
     </button>
   </form>
+</section>
 
-  <!-- Ticket history for this user -->
-  <section class="history" *ngIf="myTickets.length">
-    <h2>Your Tickets</h2>
-    <ul>
-      <li *ngFor="let t of myTickets">
-        <span class="badge" [ngClass]="(t.ticketStatus || '').toLowerCase()">
-        {{ t.ticketStatus || 'UNKNOWN' }}
-</span>
-        <strong>{{ t.ticketTitle }}</strong>
-        <small> · #{{ t.ticketId }}</small>
+<!-- My reports + chat -->
+<section class="wrap" style="margin-top:24px;">
+  <h2>My reports</h2>
 
-        <button class="link" (click)="toggleThread(t.ticketId)">View conversation</button>
+  <p class="err" *ngIf="listError">{{ listError }}</p>
 
-        <div class="thread" *ngIf="openThreadId === t.ticketId">
-          <ul>
-            <li *ngFor="let m of (messages[t.ticketId] || [])">
-              <b>{{ m.sender === 'admin' ? 'Admin' : 'You' }}:</b>
-              {{ m.text }}
-              <small> · {{ m.at }}</small>
-            </li>
-          </ul>
+  <div class="field" style="max-width:420px;">
+    <label>Search my reports</label>
+    <input
+      type="text"
+      placeholder="Search by title, content, status, or ID…"
+      [(ngModel)]="searchTerm"
+      (input)="applyFilter()"
+      [disabled]="loadingList"
+    />
+  </div>
 
-          <!-- Reply only when status is OPEN -->
-          <div class="reply" *ngIf="t.ticketStatus === 'OPEN'; else locked">
-            <input
-              type="text"
-              placeholder="Write a reply…"
-              [(ngModel)]="drafts[t.ticketId]"
-            />
-           <button (click)="sendReply(t.ticketId)" [disabled]="sending || !(drafts[t.ticketId] && drafts[t.ticketId].trim())">
-            {{ sending ? 'Sending…' : 'Reply' }}
-            </button>
-          </div>
-          <ng-template #locked>
-            <div class="note">This ticket is {{ t.ticketStatus }} — replies are disabled.</div>
-          </ng-template>
+  <div *ngIf="loadingList" class="state loading">
+    <div class="spinner" aria-hidden="true"></div>
+    <span>Loading…</span>
+  </div>
+
+  <ul *ngIf="!loadingList">
+    <li *ngIf="filtered.length === 0" class="muted">No reports yet.</li>
+
+    <li *ngFor="let t of filtered; trackBy: trackById" class="card" style="margin-bottom:14px;">
+      <div class="file-row">
+        <div class="meta">
+          <strong>#{{ t.ticketId }} · {{ t.ticketTitle || 'Untitled' }}</strong>
+          <small>{{ t.ticketStatus || 'UNKNOWN' }}</small>
         </div>
-      </li>
-    </ul>
-  </section>
+
+        <button type="button" class="remove" (click)="toggleThread(t.ticketId)">
+          {{ openThreadId === t.ticketId ? 'Hide conversation' : 'Open conversation' }}
+        </button>
+      </div>
+
+      <p class="desc" *ngIf="t.ticketContent" style="margin-top:6px;">{{ t.ticketContent }}</p>
+
+      <!-- Chat thread -->
+      <div *ngIf="openThreadId === t.ticketId" class="thread" style="margin-top:12px;">
+        <div *ngIf="!messages[t.ticketId]?.length" class="muted">No messages yet.</div>
+
+        <ul class="chat">
+          <li *ngFor="let m of (messages[t.ticketId] || [])"
+              [class.admin]="m.sender === 'ADMIN'"
+              [class.user]="m.sender === 'USER'">
+            <div class="bubble">
+              <b>{{ m.sender === 'ADMIN' ? 'Admin' : 'You' }}</b>
+              <div>{{ m.text }}</div>
+              <small>{{ m.createdAt | date:'short' }}</small>
+            </div>
+          </li>
+        </ul>
+
+        <div class="reply" style="display:flex; gap:8px; align-items:flex-start; margin-top:8px;">
+          <textarea
+            rows="2"
+            placeholder="Write a message…"
+            [(ngModel)]="drafts[t.ticketId]"
+            (keyup.enter)="sendMessage(t.ticketId)"
+            style="flex:1"
+          ></textarea>
+          <button type="button"
+                  (click)="sendMessage(t.ticketId)"
+                  [disabled]="sending || !(drafts[t.ticketId] && drafts[t.ticketId].trim())">
+            {{ sending ? 'Sending…' : 'Send' }}
+          </button>
+        </div>
+      </div>
+    </li>
+  </ul>
 </section>

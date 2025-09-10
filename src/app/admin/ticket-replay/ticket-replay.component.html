@@ -1,5 +1,5 @@
 <p>ticket-reply works!</p>
-Q<section class="wrap">
+<section class="wrap">
   <h1>Ticket Reply (Admin)</h1>
 
   <!-- Alerts -->
@@ -77,52 +77,55 @@ Q<section class="wrap">
     </table>
   </div>
 
-  <!-- Details / editor panel -->
-  <div *ngIf="selected" class="editor">
-    <h2>Editing Ticket #{{ selected.ticketId }}</h2>
+<!-- Details / editor panel -->
+<div *ngIf="selected" class="editor">
+  <h2>Editing Ticket #{{ selected.ticketId }}</h2>
 
-    <div class="grid">
-      <div class="field">
-        <label>Title</label>
-        <input type="text" [value]="selected.ticketTitle" readonly />
-      </div>
-
-      <div class="field">
-        <label>Current Status</label>
-        <select
-          [ngModel]="selected.ticketStatus"
-          (ngModelChange)="changeStatus($event)"
-          [disabled]="saving"
-          aria-label="Change status"
-        >
-          <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
-        </select>
-      </div>
+  <div class="grid">
+    <div class="field">
+      <label>Title</label>
+      <input type="text" [(ngModel)]="selected.ticketTitle" />
     </div>
 
     <div class="field">
-      <label>Content</label>
-      <textarea [value]="selected.ticketContent" rows="4" readonly></textarea>
-    </div>
-
-    <div class="field">
-      <label>Reply to user</label>
-      <textarea
-        [(ngModel)]="replyText"
-        rows="4"
-        placeholder="Write your reply to the reporter…"
+      <label>Status</label>
+      <select
+        [(ngModel)]="selected.ticketStatus"
+        (ngModelChange)="changeStatus($event)"
         [disabled]="saving"
-      ></textarea>
-      <div class="actions">
-        <button (click)="sendReply()" [disabled]="saving || !(replyText && replyText.trim())">
-          {{ saving ? 'Sending…' : 'Send Reply' }}
-        </button>
-        <button class="ghost" (click)="cancelSelection()" [disabled]="saving">
-          Cancel
-        </button>
-      </div>
+        aria-label="Change status"
+      >
+        <option *ngFor="let s of statuses" [value]="s">{{ s }}</option>
+      </select>
     </div>
-
-   
   </div>
+
+  <div class="field">
+    <label>Content</label>
+    <textarea [(ngModel)]="selected.ticketContent" rows="4"></textarea>
+  </div>
+
+  <div class="actions">
+    <button (click)="saveEdits()" [disabled]="saving">Save</button>
+    <button class="danger" (click)="deleteCurrent()" [disabled]="saving">Delete</button>
+    <button class="secondary" (click)="openChat()" [disabled]="saving">Open conversation</button>
+    <button class="ghost" (click)="cancelSelection()" [disabled]="saving">Cancel</button>
+  </div>
+
+  <div class="field">
+    <label>Reply to user (quick)</label>
+    <textarea
+      [(ngModel)]="replyText"
+      rows="3"
+      placeholder="Write your reply to the reporter…"
+      [disabled]="saving"
+    ></textarea>
+    <div class="actions">
+      <button (click)="sendReply()" [disabled]="saving || !(replyText && replyText.trim())">
+        {{ saving ? 'Sending…' : 'Send Reply' }}
+      </button>
+    </div>
+  </div>
+</div>
+
 </section>

@@ -1,0 +1,21 @@
+<section class="chat-wrap">
+  <h1>Ticket #{{ ticketId }} conversation</h1>
+  <p class="muted" *ngIf="ticket">Title: {{ ticket.ticketTitle }}</p>
+
+  <div class="alert alert-error" *ngIf="errorMsg">{{ errorMsg }}</div>
+
+  <div class="log" *ngIf="!loading">
+    <div *ngFor="let m of messages" [class]="cls(m)">
+      <div class="meta">{{ m.sender }} · {{ m.createdAt | date:'short' }}</div>
+      <div class="text">{{ m.text }}</div>
+    </div>
+    <div *ngIf="messages.length === 0" class="muted">No messages yet.</div>
+  </div>
+
+  <div class="composer">
+    <textarea [(ngModel)]="text" rows="3" placeholder="Type a message…"></textarea>
+    <button (click)="send()" [disabled]="sending || !(text && text.trim())">
+      {{ sending ? 'Sending…' : 'Send' }}
+    </button>
+  </div>
+</section>

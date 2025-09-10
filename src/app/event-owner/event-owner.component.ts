@@ -6,9 +6,6 @@ import { forkJoin, map, switchMap } from 'rxjs';
 import { EventService, EventDetail } from '../services/event.service';
 import { InvitedService,InvitedDTO,InviteCreateRequest } from '../services/invited.service';
 
-// What the backend returns/accepts for invites on this page
-
-
 // Row model used by the table
 interface EditableInvited {
   id: { eventId: number; email: string };
@@ -88,7 +85,7 @@ export class EventOwnerComponent implements OnInit {
             id: { eventId: g.eventId ?? g.id?.eventId, email: g.email ?? g.id?.email },
             firstName: g.firstName ?? '',
             note: g.note ?? undefined,
-            coming: g.coming ?? null,
+            coming: this.normalizeComing(g.coming),   // <-- normalize here
             _editing: false,
             _selected: false
           });
@@ -98,11 +95,34 @@ export class EventOwnerComponent implements OnInit {
           this.computeStats();
           this.loading = false;
         },
-        error: (err: any) => { // <-- type it
+        error: (err: any) => {
           this.error = err?.error?.message || err?.message || 'Failed to load event owner data';
           this.loading = false;
         }
       });
+  }
+
+  private normalizeComing(raw: any): boolean | null {
+    if (raw == null) return null;
+
+    // boolean already?
+    if (raw === true || raw === false) return raw;
+
+    // numeric
+    if (raw === 1 || raw === 0) return !!raw;
+
+    // string "1"/"0"/"true"/"false"
+    if (raw === '1' || raw === '0') return raw === '1';
+    if (raw === 'true' || raw === 'false') return raw === 'true';
+
+    // MySQL BIT(1) via some drivers: Buffer([0x00]) / Buffer([0x01])
+    if (typeof raw === 'object' && raw !== null && 'length' in raw && (raw as any).length === 1) {
+      const byte = (raw as any)[0];
+      if (byte === 0 || byte === 1) return !!byte;
+    }
+
+    // fall back: treat truthy as true, else false
+    try { return !!raw; } catch { return null; }
   }
 
   // ---------- Stats ----------
@@ -142,31 +162,32 @@ export class EventOwnerComponent implements OnInit {
     this.error = '';
 
     const payload: InviteCreateRequest = {
-  eventId: this.eventId,
-  email: this.newInvite.email.trim().toLowerCase(),
-  firstName: this.newInvite.firstName.trim(),
-  note: this.newInvite.note?.trim() || undefined
-};
-this.invitedService.create(payload).subscribe({
-  next: (created: InvitedDTO) => {
-    const row: EditableInvited = {
-      id: { eventId: created.eventId, email: created.email },
-      firstName: created.firstName ?? '',
-      note: created.note ?? undefined,       // normalize null → undefined for UI
-      coming: created.coming ?? null,
-      _editing: false,
-      _selected: false
+      eventId: this.eventId,
+      email: this.newInvite.email.trim().toLowerCase(),
+      firstName: this.newInvite.firstName.trim(),
+      note: this.newInvite.note?.trim() || undefined
     };
-    this.guests.unshift(row);
-    this.computeStats();
-    form.resetForm();
-    this.saving = false;
-  },
-  error: (err) => {
-    this.error = err?.error?.message || 'Failed to add invite';
-    this.saving = false;
-  }
-});
+
+    this.invitedService.create(payload).subscribe({
+      next: (created: InvitedDTO) => {
+        const row: EditableInvited = {
+          id: { eventId: created.eventId, email: created.email },
+          firstName: created.firstName ?? '',
+          note: created.note ?? undefined,                     // normalize null → undefined for UI
+          coming: this.normalizeComing(created.coming),        // <-- normalize here too
+          _editing: false,
+          _selected: false
+        };
+        this.guests.unshift(row);
+        this.computeStats();
+        form.resetForm();
+        this.saving = false;
+      },
+      error: (err) => {
+        this.error = err?.error?.message || 'Failed to add invite';
+        this.saving = false;
+      }
+    });
   }
 
   // ---------- Bulk add ----------
@@ -181,38 +202,38 @@ this.invitedService.create(payload).subscribe({
     if (!rows.length) return;
 
     const creations = rows.map(line => {
-  const [firstName, email, note] = line.split(',').map(s => (s ?? '').trim());
-  const payload: InviteCreateRequest = {
-    eventId: this.eventId,
-    email: email.toLowerCase(),
-    firstName,
-    note: note || undefined
-  };
-  return this.invitedService.create(payload);
-});
-
-forkJoin(creations).subscribe({
-  next: (list: InvitedDTO[]) => {
-    list.forEach(created => {
-      const row: EditableInvited = {
-        id: { eventId: created.eventId, email: created.email },
-        firstName: created.firstName ?? '',
-        note: created.note ?? undefined,     // normalize
-        coming: created.coming ?? null,
-        _editing: false,
-        _selected: false
+      const [firstName, email, note] = line.split(',').map(s => (s ?? '').trim());
+      const payload: InviteCreateRequest = {
+        eventId: this.eventId,
+        email: email.toLowerCase(),
+        firstName,
+        note: note || undefined
       };
-      this.guests.unshift(row);
+      return this.invitedService.create(payload);
     });
-    this.computeStats();
-    this.bulkText = '';
-    this.saving = false;
-  },
-  error: (err) => {
-    this.error = err?.error?.message || 'Bulk add failed (check your lines)';
-    this.saving = false;
-  }
-});
+
+    forkJoin(creations).subscribe({
+      next: (list: InvitedDTO[]) => {
+        list.forEach(created => {
+          const row: EditableInvited = {
+            id: { eventId: created.eventId, email: created.email },
+            firstName: created.firstName ?? '',
+            note: created.note ?? undefined,                   // normalize
+            coming: this.normalizeComing(created.coming),      // <-- normalize here too
+            _editing: false,
+            _selected: false
+          };
+          this.guests.unshift(row);
+        });
+        this.computeStats();
+        this.bulkText = '';
+        this.saving = false;
+      },
+      error: (err) => {
+        this.error = err?.error?.message || 'Bulk add failed (check your lines)';
+        this.saving = false;
+      }
+    });
   }
 
   // ---------- Edit one ----------
@@ -233,12 +254,12 @@ forkJoin(creations).subscribe({
     };
 
     this.invitedService.update(upd).subscribe({
-      next: (saved: { firstName?: string; note?: string }) => {  // <-- reflect update() return type
+      next: (saved: { firstName?: string; note?: string }) => {
         g.firstName = (saved.firstName ?? upd.firstName) ?? '';
-        g.note = saved.note == null ? upd.note : saved.note;     // normalize null → undefined
+        g.note = saved.note == null ? upd.note : saved.note;   // normalize null → undefined
         g._editing = false;
       },
-      error: (err: any) => {                                     // <-- type it
+      error: (err: any) => {
         this.error = err?.error?.message || 'Failed to save invite';
       }
     });

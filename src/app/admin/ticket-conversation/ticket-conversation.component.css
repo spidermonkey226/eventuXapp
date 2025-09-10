@@ -1,0 +1,8 @@
+.chat-wrap { max-width: 840px; margin: 0 auto; display: grid; gap: 1rem; }
+.log { display: grid; gap: .5rem; padding: 1rem; background: #fafafa; border: 1px solid #eee; border-radius: 8px; max-height: 60vh; overflow: auto; }
+.bubble { max-width: 70%; padding: .5rem .75rem; border-radius: 12px; }
+.bubble .meta { font-size: 12px; opacity: .7; margin-bottom: .25rem; }
+.bubble.user { background: #eaf3ff; align-self: start; }
+.bubble.admin { background: #e8ffe8; justify-self: end; }
+.composer { display: grid; gap: .5rem; }
+.muted { opacity: .7; }

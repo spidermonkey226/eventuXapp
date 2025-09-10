@@ -73,24 +73,37 @@ ngOnInit() {
 
 
   submit() {
-    if (!this.guest || !this.response) return;
+  if (!this.guest || !this.response) return;
 
-    const coming = this.response === 'yes';
+  // Try all known shapes to extract eventId + email safely
+  const eventId =
+    this.guest?.id?.eventId ??
+    this.guest?.event?.eventId ??
+    (this as any)?.event?.eventId ??
+    (this as any)?.event?.id ??
+    (this.guest as any)?.eventId; // last resort if backend flattens it
 
-    this.invitedService.updateStatus(
-      this.guest.id.eventId,
-      this.guest.id.email,
-      coming,
-      this.note
-    ).subscribe({
-      next: () => {
-        this.confirmed = true;
-      },
+  const email =
+    this.guest?.id?.email ??
+    (this.guest as any)?.email;
+
+  if (!eventId || !email) {
+    console.error('Missing eventId or email on guest:', this.guest);
+    this.error = 'Something went wrong. Your RSVP link seems incomplete.';
+    return;
+  }
+
+  const coming = this.response === 'yes';
+
+  this.invitedService
+    .updateStatus(eventId, email, coming, this.note)
+    .subscribe({
+      next: () => (this.confirmed = true),
       error: (err) => {
         console.error('Failed to submit RSVP', err);
         this.error = 'Something went wrong. Please try again later.';
-      }
+      },
     });
-  }
+}
   
 }

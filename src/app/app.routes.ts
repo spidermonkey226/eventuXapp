@@ -20,6 +20,9 @@ import { MyInvitationsComponent } from './my-invitations/my-invitations.componen
 import { InvitedEventComponent } from './invited-event/invited-event.component';
 import { InvitedEventDetailsComponent } from './invited-event/invited-event-details/invited-event-details.component';
 import { InvitedEventReportComponent } from './invited-event/invited-event-report/invited-event-report.component';
+import { TicketConversationComponent } from './admin/ticket-conversation/ticket-conversation.component';
+import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './reset-password/reset-password.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -35,6 +38,8 @@ export const routes: Routes = [
     { path: 'subscribe', component: SubscribeComponent},
     { path: 'payment', component: PaymentComponent},
     { path: "my-invitations", component :MyInvitationsComponent},
+    { path: "forgot-password", component: ForgotPasswordComponent},
+    { path: "reset-password", component: ResetPasswordComponent},
     { path: 'rsvp', loadComponent: () => import('./rsvp/rsvp.component').then(m => m.RsvpComponent) },
     {
     path: 'admin',
@@ -45,7 +50,7 @@ export const routes: Routes = [
       { path: 'events', component: EventEditorComponent },
       { path: 'events/:id', component: EventEditorComponent },
       { path: 'tickets', component: TicketReplayComponent }, 
-      { path: 'tickets/:id',component: TicketReplayComponent },
+      { path: 'tickets/:id',component: TicketConversationComponent },
       { path: '', pathMatch: 'full', redirectTo: 'users' }
     ]
   },

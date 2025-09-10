@@ -3,12 +3,12 @@ import { Ticket } from '../../class/ticket';
 import { TicketService } from '../../services/ticket.service';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { BrowserModule } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-ticket-replay',
   standalone: true,
-  imports: [BrowserModule,CommonModule,FormsModule],
+  imports: [CommonModule,FormsModule],
   templateUrl: './ticket-replay.component.html',
   styleUrl: './ticket-replay.component.css'
 })
@@ -28,7 +28,7 @@ export class TicketReplayComponent implements OnInit{
   statuses = ['OPEN', 'IN_PROGRESS', 'RESOLVED', 'CLOSED'] as const;
   searchTerm = '';
 
-  constructor(private ticketService: TicketService) {}
+   constructor(private ticketService: TicketService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadTickets();
@@ -179,6 +179,30 @@ export class TicketReplayComponent implements OnInit{
     }
     this.applyFilter();
   }
+  deleteCurrent(): void {
+    if (!this.selected) return;
+    if (!confirm(`Delete ticket #${this.selected.ticketId}?`)) return;
 
+    this.saving = true;
+    this.ticketService.delete(this.selected.ticketId).subscribe({
+      next: () => {
+        this.tickets = this.tickets.filter(t => t.ticketId !== this.selected!.ticketId);
+        this.applyFilter();
+        this.selected = null;
+        this.saving = false;
+        this.successMsg = 'Ticket deleted.';
+      },
+      error: (err) => {
+        console.error(err);
+        this.saving = false;
+        this.errorMsg = 'Failed to delete ticket.';
+      }
+    });
+  }
+
+  openChat(): void {
+    if (!this.selected) return;
+    this.router.navigate(['/admin/tickets', this.selected.ticketId]);
+  }
   trackById = (_: number, t: Ticket) => t.ticketId;
 }
