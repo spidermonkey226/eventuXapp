@@ -1,5 +1,19 @@
-/* layout */
-.eo-container { max-width: 1100px; margin: 64px auto 40px; padding: 20px; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial; }
+/* ===== Shell + sidebar ===== */
+.eo-shell { display:flex; min-height: 100vh; background:#f8fafc;margin-top: 80px; }
+.eo-sidebar { width:240px; background:#0f172a; color:#e5e7eb; padding:18px; position:sticky; top:0; align-self:flex-start; height:100vh; }
+.eo-sb-title { font-weight:800; font-size:16px; margin-bottom:12px; }
+.eo-sb-nav { display:flex; flex-direction:column; gap:6px; }
+.eo-sb-nav a { display:block; color:#cbd5e1; padding:10px 12px; border-radius:10px; text-decoration:none; }
+.eo-sb-nav a.active, .eo-sb-nav a:hover { background:#1f2937; color:#fff; }
+
+.eo-main { flex:1; padding:24px 16px; }
+.eo-container { max-width: 1100px; margin: 0 auto 40px; }
+
+/* ===== Cards & minor polish ===== */
+.card { background:#fff; border:1px solid #e6e9ef; border-radius:14px; padding:16px; box-shadow:0 2px 8px rgba(17,24,39,.04); }
+.tbl-wrap { overflow:auto; border-radius:12px; border:1px solid #e6e9ef; background:#fff; }
+
+/* ===== Shared (kept from your old css) ===== */
 .eo-state, .eo-error { padding: 12px 14px; border-radius: 10px; margin-bottom: 16px; }
 .eo-error { background: #ffe8e8; color: #b00020; } .eo-state { background: #f5f7fb; color: #111827; }
 
@@ -10,20 +24,17 @@
 .eo-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; background: #fff; border: 1px solid #e6e9ef; border-radius: 14px; padding: 12px; }
 .eo-meta-label { font-size: 12px; color: #6b7280; } .eo-meta-value { font-size: 14px; font-weight: 600; color: #111827; }
 
-/* stats (reuse from manager) */
 .stats-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 20px 0 28px; }
 @media (max-width: 768px){ .stats-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .stat-card { background:#fff; border:1px solid #e6e9ef; border-left:5px solid #4a90e2; padding:18px; border-radius:14px; text-align:center; box-shadow:0 2px 8px rgba(17,24,39,.04); }
 .stat-card h3{ margin:0; font-size:14px; color:#374151; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
 .stat-card p{ margin-top:10px; font-size:30px; font-weight:800; color:#1f4fd6; }
 
-/* sections */
-.eo-section { margin-top: 26px; }
+.eo-section { margin-top: 16px; }
 .eo-section-title { margin: 0 0 10px 0; font-size: 18px; font-weight: 800; }
 .eo-help { margin: 6px 0 10px; color:#6b7280; font-size: 13px; }
 .eo-muted { color:#6b7280; font-size: 13px; }
 
-/* form controls */
 .row { display:flex; align-items:center; gap:10px; }
 .row.space { justify-content: space-between; }
 .row.gap { gap: 8px; flex-wrap: wrap; }
@@ -42,8 +53,7 @@
 .eo-file-list li { display:flex; align-items:center; gap:8px; padding:6px 0; border-bottom:1px dashed #eee; }
 .file-name { flex:1; }
 
-/* table */
-.tbl { width:100%; border-collapse: collapse; background:#fff; border:1px solid #e6e9ef; border-radius:12px; overflow:hidden; }
+.tbl { width:100%; border-collapse: collapse; }
 .tbl th, .tbl td { padding:10px; border-bottom:1px solid #edf0f5; text-align:left; font-size:14px; }
 .tbl th { background:#f8fafc; font-weight:700; color:#374151; }
 .tbl tr:last-child td { border-bottom: none; }

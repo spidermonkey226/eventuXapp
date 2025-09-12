@@ -23,6 +23,11 @@ import { InvitedEventReportComponent } from './invited-event/invited-event-repor
 import { TicketConversationComponent } from './admin/ticket-conversation/ticket-conversation.component';
 import { ForgotPasswordComponent } from './forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { EventOwnerResolver } from './event-owner/event-owner.resolver';
+import { EventOwnerGuestsComponent } from './event-owner/event-owner.guests/event-owner.guests.component';
+import { EventOwnerFilesComponent } from './event-owner/event-owner.files/event-owner.files.component';
+import { EventOwnerReportsComponent } from './event-owner/event-owner.reports/event-owner.reports.component';
+
 
 export const routes: Routes = [
     { path: '', redirectTo: '/home', pathMatch: 'full' },
@@ -33,7 +38,7 @@ export const routes: Routes = [
     { path: 'profile', component: ProfileComponent},
     { path: 'event-manager/:id', component:EventManagerComponent},
     { path: 'user-events', component:UserEventsComponent},
-    { path: 'event-owner/:id', component:EventOwnerComponent},
+   
     { path: 'report-ticket', component: ReportTicketComponent },
     { path: 'subscribe', component: SubscribeComponent},
     { path: 'payment', component: PaymentComponent},
@@ -41,6 +46,18 @@ export const routes: Routes = [
     { path: "forgot-password", component: ForgotPasswordComponent},
     { path: "reset-password", component: ResetPasswordComponent},
     { path: 'rsvp', loadComponent: () => import('./rsvp/rsvp.component').then(m => m.RsvpComponent) },
+
+     {
+      path: 'event-owner/:id',
+      component: EventOwnerComponent,             // this is now the layout
+      resolve: { bootstrap: EventOwnerResolver }, // triggers store.bootstrap(id)
+      children: [
+        { path: '', pathMatch: 'full', redirectTo: 'guests' },
+        { path: 'guests',  component: EventOwnerGuestsComponent },
+        { path: 'files', component: EventOwnerFilesComponent },
+        { path: 'reports', component: EventOwnerReportsComponent },
+      ],
+    },
     {
     path: 'admin',
     component: AdminComponent,

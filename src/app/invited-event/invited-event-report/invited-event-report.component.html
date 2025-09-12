@@ -15,6 +15,7 @@
     <div class="spinner" aria-hidden="true"></div><span>Loading event…</span>
   </div>
 
+  <!-- Create new report -->
   <form *ngIf="!loadingEvent && !errorMsg" [formGroup]="form" (ngSubmit)="submit()" novalidate>
     <div class="field">
       <label>Title</label>
@@ -38,4 +39,124 @@
       {{ submitting ? 'Sending…' : 'Send to event owner' }}
     </button>
   </form>
+</section>
+
+<!-- My reports for THIS event + chat (same look as user tickets) -->
+<section class="wrap" style="margin-top:24px;">
+  <h2>My reports for this event</h2>
+
+  <p class="err" *ngIf="listError">{{ listError }}</p>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <input
+      type="text"
+      class="search"
+      placeholder="Search by title, content, status, or ID…"
+      [(ngModel)]="searchTerm"
+      (input)="applyFilter()"
+      [disabled]="loadingList"
+      aria-label="Search my tickets for this event"
+    />
+    <button type="button" (click)="loadMyReports()" [disabled]="loadingList">
+      {{ loadingList ? 'Loading…' : 'Refresh' }}
+    </button>
+  </div>
+
+  <div class="table-wrap">
+    <table class="tickets">
+      <thead>
+        <tr>
+          <th style="width: 90px;">ID</th>
+          <th>Title</th>
+          <th style="width: 140px;">Status</th>
+          <th style="width: 140px;">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- loading -->
+        <tr *ngIf="loadingList">
+          <td colspan="4">Loading tickets…</td>
+        </tr>
+
+        <!-- empty -->
+        <tr *ngIf="!loadingList && filtered.length === 0">
+          <td colspan="4">No reports yet.</td>
+        </tr>
+
+        <!-- rows -->
+        <ng-container *ngFor="let t of filtered; trackBy: trackById">
+          <tr [class.active]="openThreadId === t.ticketId">
+            <td>#{{ t.ticketId }}</td>
+
+            <td>
+              <div class="title">{{ t.ticketTitle || 'Untitled' }}</div>
+              <div class="content-muted">
+                {{ t.ticketContent || '' }}
+              </div>
+            </td>
+
+            <td>
+              <span class="badge" [attr.data-status]="t.ticketStatus">
+                {{ t.ticketStatus || 'UNKNOWN' }}
+              </span>
+            </td>
+
+            <td>
+              <button type="button" (click)="toggleThread(t.ticketId)">
+                {{ openThreadId === t.ticketId ? 'Hide conversation' : 'Open conversation' }}
+              </button>
+            </td>
+          </tr>
+
+          <!-- chat / ping-pong -->
+          <tr *ngIf="openThreadId === t.ticketId" class="details">
+            <td colspan="4">
+              <div class="thread">
+                <div *ngIf="!(messages[t.ticketId]?.length)" class="muted">
+                  No messages yet.
+                </div>
+
+                <ul class="chat">
+                  <li *ngFor="let m of (messages[t.ticketId] || [])"
+                      [class.admin]="m.sender === 'ADMIN'"
+                      [class.user]="m.sender === 'USER'">
+                    <div class="bubble">
+                      <b>{{ m.sender === 'ADMIN' ? 'Admin' : 'You' }}</b>
+                      <div>{{ m.text }}</div>
+                      <small>{{ m.createdAt | date:'short' }}</small>
+                    </div>
+                  </li>
+                </ul>
+
+                <!-- CLOSED notice -->
+                <div *ngIf="t.ticketStatus === 'CLOSED'" class="muted" style="margin-top:6px;">
+                  This conversation is closed. You can’t send new messages.
+                </div>
+
+                <!-- composer only when not CLOSED -->
+                <div class="reply" *ngIf="t.ticketStatus !== 'CLOSED'"
+                     style="display:flex; gap:8px; align-items:flex-start; margin-top:8px;">
+                  <textarea
+                    rows="2"
+                    placeholder="Write a message…"
+                    [(ngModel)]="drafts[t.ticketId]"
+                    (keyup.enter)="sendMessage(t.ticketId)"
+                    style="flex:1"
+                  ></textarea>
+
+                  <button type="button"
+                          (click)="sendMessage(t.ticketId)"
+                          [disabled]="sending || !(drafts[t.ticketId] && drafts[t.ticketId].trim())">
+                    {{ sending ? 'Sending…' : 'Send' }}
+                  </button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
 </section>

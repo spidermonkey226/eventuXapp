@@ -1,0 +1,59 @@
+<!-- event-owner-layout.component.html -->
+<div class="eo-shell">
+  <aside class="eo-sidebar">
+    <div class="eo-sb-title">Event Owner</div>
+    <nav class="eo-sb-nav">
+      <a [routerLink]="['./guests']" routerLinkActive="active">Guests</a>
+      <a [routerLink]="['./files']"  routerLinkActive="active">Files</a>
+      <a [routerLink]="['./reports']" routerLinkActive="active">Reports</a>
+    </nav>
+  </aside>
+
+  <main class="eo-main">
+    <!-- Top header always visible -->
+    <div class="eo-header" *ngIf="(store.loading$|async) === false">
+      <h1 class="eo-title">
+        Event Owner: {{ eventName(store.event$|async) }}
+        <span class="eo-sub">(ID: {{ eventCode(store.event$|async) }})</span>
+      </h1>
+
+      <div class="eo-meta">
+        <div>
+          <div class="eo-meta-label">Date</div>
+          <div class="eo-meta-value">{{ (store.event$|async)?.eventDate | date:'mediumDate' }}</div>
+        </div>
+        <div>
+          <div class="eo-meta-label">Category</div>
+          <div class="eo-meta-value">{{ (store.event$|async)?.eventCatgory }}</div>
+        </div>
+        <div>
+          <div class="eo-meta-label">Address</div>
+          <div class="eo-meta-value">
+            {{ (store.event$|async)?.address?.streetName }} {{ (store.event$|async)?.address?.streetNumber }},
+            {{ (store.event$|async)?.address?.city }} {{ (store.event$|async)?.address?.postCode }}
+          </div>
+        </div>
+        <div>
+          <div class="eo-meta-label">Manager</div>
+          <div class="eo-meta-value">
+            {{ ((store.event$|async)?.manager?.firstName||'') + ' ' + ((store.event$|async)?.manager?.lastName||'') 
+               || (store.event$|async)?.manager?.email }}
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-grid" *ngIf="store.stats$|async as s">
+        <div class="stat-card"><h3>Attending</h3><p>{{ s.coming }}</p></div>
+        <div class="stat-card"><h3>Not Attending</h3><p>{{ s.notComing }}</p></div>
+        <div class="stat-card"><h3>No Response</h3><p>{{ s.noResp }}</p></div>
+        <div class="stat-card"><h3>Total Invited</h3><p>{{ s.total }}</p></div>
+      </div>
+    </div>
+
+    <div *ngIf="store.loading$|async" class="eo-state">Loading owner panel…</div>
+    <div *ngIf="store.error$|async as err" class="eo-error" [hidden]="!err">{{ err }}</div>
+
+    <!-- Child views render here -->
+    <router-outlet></router-outlet>
+  </main>
+</div>

@@ -1,0 +1,116 @@
+<section class="wrap">
+  <h2 style="margin:0 0 8px;">Event reports</h2>
+  <p class="muted" style="margin:0 0 12px;">
+    Tickets for this event (#{{ store.eventId }}). Open a conversation to reply as <b>ADMIN</b>.
+  </p>
+
+  <p class="err" *ngIf="error">{{ error }}</p>
+
+  <div class="table-wrap">
+    <table class="tickets">
+      <thead>
+        <tr>
+          <th style="width: 90px;">ID</th>
+          <th>Title</th>
+          <th style="width: 140px;">Status</th>
+          <th style="width: 200px;">Reporter</th>
+          <th style="width: 160px;">Created</th>
+          <th style="width: 200px;">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <!-- loading -->
+        <tr *ngIf="loading">
+          <td colspan="6">Loading tickets…</td>
+        </tr>
+
+        <!-- empty -->
+        <tr *ngIf="!loading && tickets.length === 0">
+          <td colspan="6">No tickets for this event yet.</td>
+        </tr>
+
+        <!-- rows -->
+       <ng-container *ngFor="let t of tickets; trackBy: trackById">
+  <ng-container *ngIf="getId(t) as id">
+    <tr [class.active]="openThreadId === id">
+      <td>#{{ id }}</td>
+
+      <td>
+        <div class="title">{{ getTitle(t) || 'Untitled' }}</div>
+        <div class="content-muted">{{ getPreview(t) }}</div>
+      </td>
+
+      <td>
+        <span class="badge" [attr.data-status]="getStatusUpper(t)">
+          {{ getStatusUpper(t) }}
+        </span>
+      </td>
+
+      <td>{{ getReporter(t) || '-' }}</td>
+      <td>{{ getCreatedAt(t) | date:'medium' }}</td>
+
+      <td>
+        <div class="row gap" style="align-items:center;">
+          <select class="input" [ngModel]="getStatusUpper(t)"
+                  (ngModelChange)="changeStatus(t, $event)"
+                  style="min-width:140px;">
+            <option value="OPEN">OPEN</option>
+            <option value="IN_PROGRESS">IN_PROGRESS</option>
+            <option value="CLOSED">CLOSED</option>
+          </select>
+
+          <button type="button" class="ghost" (click)="toggleThread(id)">
+            {{ openThreadId === id ? 'Hide' : 'Conversation' }}
+          </button>
+
+          <button type="button" class="danger" (click)="remove(t)">
+            Delete
+          </button>
+        </div>
+      </td>
+    </tr>
+
+    <!-- details row -->
+    <tr *ngIf="openThreadId === id" class="details">
+      <td colspan="6">
+        <div class="thread">
+          <div class="muted" *ngIf="!(messages[id]?.length)">No messages yet.</div>
+
+          <ul class="chat">
+            <li *ngFor="let m of (messages[id] || [])"
+                [class.admin]="m.sender === 'ADMIN'"
+                [class.user]="m.sender === 'USER'">
+              <div class="bubble">
+                <b>{{ m.sender === 'ADMIN' ? 'Admin' : 'User' }}</b>
+                <div>{{ m.text }}</div>
+                <small>{{ m.createdAt | date:'short' }}</small>
+              </div>
+            </li>
+          </ul>
+
+          <div *ngIf="getStatusUpper(t) === 'CLOSED'" class="muted" style="margin-top:6px;">
+            This conversation is closed. You can’t send new messages.
+          </div>
+
+          <div class="reply" *ngIf="getStatusUpper(t) !== 'CLOSED'">
+            <textarea rows="2"
+                      placeholder="Write a message as ADMIN…"
+                      [(ngModel)]="drafts[id]"
+                      (keyup.enter)="sendMessage(id)"></textarea>
+
+            <button type="button"
+                    (click)="sendMessage(id)"
+                    [disabled]="sending || !(drafts[id] && drafts[id].trim())">
+              {{ sending ? 'Sending…' : 'Send' }}
+            </button>
+          </div>
+        </div>
+      </td>
+    </tr>
+  </ng-container>
+</ng-container>
+      </tbody>
+    </table>
+  </div>
+</section>

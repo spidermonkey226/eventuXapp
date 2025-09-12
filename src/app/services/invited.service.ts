@@ -59,6 +59,17 @@ export class InvitedService {
   // Keep the return type as Invited to satisfy rsvp.component
   return this.http.get<Invited>(url);
 }
+getMine(eventId: number) {
+  return this.http.get<Invited>(`${this.baseUrl}/${eventId}/me`);
+}
+
+resend(eventId: number, email: string) {
+  return this.http.post(`${this.baseUrl}/${eventId}/${encodeURIComponent(email)}/resend`, {});
+}
+
+  getByEventAndMe(eventId: number) {
+  return this.http.get<Invited>(`${this.baseUrl}/events/${eventId}/me`);
+}
 
   create(req: InviteCreateRequest): Observable<InvitedDTO> {
     return this.http.post<InvitedDTO>(this.baseUrl, req);

@@ -1,0 +1,75 @@
+<section class="eo-section card">
+  <h2 class="eo-section-title">Add Invite</h2>
+  <form #addForm="ngForm" (ngSubmit)="addInvite(addForm)" class="row gap">
+    <input class="input" name="firstName" placeholder="First name" [(ngModel)]="newInvite.firstName" required />
+    <input class="input" name="email" placeholder="Email" [(ngModel)]="newInvite.email" required email />
+    <input class="input" name="note" placeholder="Note (optional)" [(ngModel)]="newInvite.note" />
+    <button class="btn primary" type="submit" [disabled]="saving || !addForm.valid">Add</button>
+  </form>
+</section>
+
+<section class="eo-section card">
+  <h2 class="eo-section-title">Bulk Add</h2>
+  <p class="eo-help">Paste one per line: <code>firstName,email[,note]</code></p>
+  <textarea class="textarea" [(ngModel)]="bulkText" name="bulkText" rows="5"
+    placeholder="Alice,alice@mail.com&#10;Bob,bob@mail.com,vegetarian"></textarea>
+  <div class="row">
+    <button class="btn" (click)="addBulk()" [disabled]="saving || !bulkText.trim()">Import</button>
+  </div>
+</section>
+
+<section class="eo-section card">
+  <h2 class="eo-section-title">Guest List</h2>
+
+  <div class="row space">
+    <label><input type="checkbox" [(ngModel)]="selectAll" name="selectAll" (change)="toggleSelectAll()"> Select all</label>
+    <button class="btn danger" (click)="deleteSelected()" [disabled]="!hasSelected()">Delete selected</button>
+  </div>
+
+  <div class="tbl-wrap" *ngIf="store.guests$|async as guests">
+    <table class="tbl">
+      <thead>
+        <tr>
+          <th style="width:36px;"><input type="checkbox" [(ngModel)]="selectAll" name="selectAll2" (change)="toggleSelectAll()"></th>
+          <th>First Name</th>
+          <th>Email</th>
+          <th>RSVP</th>
+          <th>Note</th>
+          <th style="width:140px;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let g of guests">
+          <td><input type="checkbox" [(ngModel)]="g._selected" name="sel_{{g.id.email}}" /></td>
+
+          <td *ngIf="!g._editing">{{ g.firstName }}</td>
+          <td *ngIf="g._editing"><input class="input" [(ngModel)]="g._draftFirstName" name="fn_{{g.id.email}}" /></td>
+
+          <td>{{ g.id.email }}</td>
+
+          <td>
+            <span class="chip" *ngIf="g.coming === true">Coming</span>
+            <span class="chip warn" *ngIf="g.coming === false">Not Coming</span>
+            <span class="chip muted" *ngIf="g.coming == null">No Response</span>
+          </td>
+
+          <td *ngIf="!g._editing">{{ g.note || '—' }}</td>
+          <td *ngIf="g._editing"><input class="input" [(ngModel)]="g._draftNote" name="nt_{{g.id.email}}" /></td>
+
+          <td class="actions">
+            <ng-container *ngIf="!g._editing; else editingBtns">
+              <button class="link" (click)="g._editing=true; g._draftFirstName=g.firstName; g._draftNote=g.note||''">Edit</button>
+              <button class="link danger" (click)="deleteInvite(g)">Delete</button>
+               <button class="link resend" *ngIf="g.coming == null" (click)="resendInvite(g)">Resend</button>
+            </ng-container>
+            <ng-template #editingBtns>
+              <button class="link" (click)="saveEdit(g)">Save</button>
+              <button class="link muted" (click)="cancelEdit(g)">Cancel</button>
+            </ng-template>
+            
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

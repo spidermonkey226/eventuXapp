@@ -1,0 +1,16 @@
+<section class="eo-section card">
+  <h2 class="eo-section-title">Files</h2>
+
+  <div class="eo-files">
+    <input type="file" multiple (change)="onFilePick($event)" />
+
+    <ul class="eo-file-list" *ngIf="(store.files$|async)?.length; else noFiles">
+      <li *ngFor="let f of (store.files$|async)">
+        <span class="file-name">{{ f.name || ('File #' + f.id) }}</span>
+        <button class="link danger" (click)="deleteFile(f.id!)">Delete</button>
+      </li>
+    </ul>
+
+    <ng-template #noFiles><div class="eo-muted">No files yet.</div></ng-template>
+  </div>
+</section>

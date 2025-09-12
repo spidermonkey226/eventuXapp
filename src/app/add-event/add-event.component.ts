@@ -124,7 +124,12 @@ export class AddEventComponent implements OnInit {
       next: () => {
         this.successMsg = 'Event created successfully!';
         this.submitting = false;
-        this.router.navigateByUrl('/event-manager'); // uncomment if you want redirect
+        this.router.navigateByUrl('/user-events'); // uncomment if you want redirect
+
+        this.auth.refreshUser().subscribe({
+          next: () => this.router.navigateByUrl('/user-events'),
+          error: () => this.router.navigateByUrl('/user-events') // still navigate if refresh fails
+        });
       },
       error: (err) => {
         this.submitting = false;

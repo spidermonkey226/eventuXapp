@@ -99,12 +99,19 @@ export class EventService {
       `${API}/events/${eventId}/files`
     );
   }
+  getFilesMine(eventId: number) {
+  return this.http.get<{id:number; name:string; size?:string; type?:string}[]>(
+    `${API}/events/${eventId}/files/mine`
+  );
+}
 
   uploadFiles(eventId: number, files: File[]) {
   const form = new FormData();
-  files.forEach(f => form.append('files', f));
-  return this.http.post<{id:number; name:string}[]>(
-    `${API}/events/${eventId}/files`, form
+  files.forEach(f => form.append('files', f)); 
+
+  return this.http.post<{ id:number; name:string }[]>(
+    `${API}/events/${eventId}/files`,
+    form
   );
 }
 

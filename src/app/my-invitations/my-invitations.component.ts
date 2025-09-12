@@ -89,9 +89,26 @@ export class MyInvitationsComponent implements OnInit {
   }
 
   openEvent(id?: number) {
-    if (!id) return;
-    this.router.navigate(['/invited-event', id]); // or '/events/:id' if that’s your details route
+  if (!id) return;
+
+  const invite = this.items.find(it =>
+    (it.event.eventID ?? it.event.eventId ?? it.event.id) === id
+  )?.invited;
+
+  if (!invite) return;
+
+  if (invite.coming === true) {
+    // accepted → go to event
+    this.router.navigate(['/invited-event', id]);
+  } else if (invite.coming === false) {
+    // declined → maybe block or show message
+    alert('You declined this invitation. You cannot enter the event.');
+  } else {
+    // pending → force RSVP page
+    this.router.navigate(['/rsvp'], { queryParams: { eventId: id } });
+
   }
+}
 
   statusClass(v: InvitedDTO['coming']) {
     if (v === true) return 'status accepted';

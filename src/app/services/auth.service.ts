@@ -28,6 +28,22 @@ export class AuthService {
     }
   }
 
+   /** PUBLIC: allow other components/services to push a new user snapshot */
+  setUser(user: any | null) {
+    this.writeUser(user ? { ...user, permision: user.permision ? { ...user.permision } : undefined } : null);
+  }
+
+  /** PUBLIC: refetch /me from server and emit it */
+  refreshUser() {
+    return this.http.get<any>(`${API}/users/me`).pipe(
+      tap(me => this.setUser(me)),
+      catchError(err => {
+        // If /me fails, don’t blow up the app; keep whatever we had
+        return of(this.userSub.value);
+      })
+    );
+  }
+  
   private writeUser(user: any | null) {
     if (this.isBrowser) {
       if (user) sessionStorage.setItem('loggedInUser', JSON.stringify(user));

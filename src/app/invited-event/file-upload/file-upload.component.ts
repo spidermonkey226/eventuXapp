@@ -55,7 +55,7 @@ export class FileUploadComponent  implements OnInit {
   refreshList() {
     this.loadingList = true;
     this.listError = '';
-    this.eventSvc.getFiles(this.eventId).subscribe({
+    this.eventSvc.getFilesMine(this.eventId).subscribe({
       next: (list) => { this.existingFiles = list ?? []; this.loadingList = false; },
       error: (err) => {
         this.listError = err?.error?.message || 'Failed to load files';

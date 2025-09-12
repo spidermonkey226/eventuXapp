@@ -29,47 +29,33 @@ export class RsvpComponent implements OnInit {
   ) {}
 
 ngOnInit() {
-  this.eventId = this.route.snapshot.queryParamMap.get('eventId');
+  this.eventId = this.route.snapshot.paramMap.get('id')
+              || this.route.snapshot.queryParamMap.get('eventId');
   this.token = this.route.snapshot.queryParamMap.get('token');
 
   if (this.token) {
+    // ✅ Case 1: from email link
     this.invitedService.getByToken(this.token).subscribe({
       next: (invited) => {
         this.guest = invited;
         this.event = invited.event;
       },
-      error: (err) => {
-        console.error('Invalid token or guest not found', err);
-        this.error = 'Invalid or expired RSVP link.';
-      }
+      error: () => this.error = 'Invalid or expired RSVP link.'
+    });
+  } else if (this.eventId) {
+    // ✅ Case 2: from MyInvitations
+    this.invitedService.getMine(Number(this.eventId)).subscribe({
+      next: (invited) => {
+        this.guest = invited;
+        this.event = invited.event;
+      },
+      error: () => this.error = 'Could not load your invitation for this event.'
     });
   } else {
-    // ✅ TEST MODE: inject mock guest + event
-    this.guest = {
-      id: {
-        eventId: 999,
-        email: 'test@example.com'
-      },
-      firstName: 'Test User',
-      event: {
-        eventId: 999,
-        name: 'Mock Test Event'
-      },
-      token: 'mock-token'
-    };
-
-    this.event = {
-      name: 'Mock Test Event',
-      rsvpSettings: {
-        customMessage: 'This is a test RSVP page.',
-        questionText: 'Do you want to join the mock event?',
-        showNote: true,
-        buttonText: 'Submit Test RSVP',
-        theme: 'default'
-      }
-    };
+    this.error = 'Missing RSVP context.';
   }
 }
+
 
 
   submit() {

@@ -1,0 +1,25 @@
+:host { display:block; }
+
+.eo-section.card { margin-top: 16px; }
+
+/* File input spacing */
+.eo-files input[type="file"] { max-width: 100%; }
+
+/* Improve list rows */
+.eo-file-list { margin-top: 4px; }
+.eo-file-list li {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:10px 8px; border-bottom:1px dashed #e9edf3;
+  transition: background .15s ease;
+}
+.eo-file-list li:hover { background:#f9fafb; }
+
+/* File name truncation */
+.file-name {
+  flex: 1;
+  font-weight: 600;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+
+/* Keep destructive link clear */
+.link.danger { font-weight: 600; }
