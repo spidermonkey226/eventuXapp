@@ -101,7 +101,7 @@ export class UserEditorComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       phone: [''],
       password: [''], // optional, only if changing password
-      permission: [null, Validators.required]
+      permision: [null, Validators.required]
     });
   }
 
@@ -114,7 +114,7 @@ export class UserEditorComponent implements OnInit {
           lastName: user.lastName,
           email: user.email,
           phone: user.phone,
-          permission: user.permission
+          permision: user.permision?.id
         });
         this.loading = false;
       },
@@ -126,19 +126,32 @@ export class UserEditorComponent implements OnInit {
   }
 
   save(): void {
-    if (this.form.invalid || !this.userId) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    this.userService.updateUser(this.userId, this.form.value).subscribe({
-      next: () => {
-        console.log('User updated');
-        this.router.navigate(['/admin/users']);
-      },
-      error: (err) => console.error('Error updating user:', err)
-    });
+  if (this.form.invalid || !this.userId) {
+    this.form.markAllAsTouched();
+    return;
   }
+
+  const raw = this.form.value;
+
+  const payload = {
+    ...raw,
+    permision: raw.permision ? { id: raw.permision } : null  // 👈 wrap the id into an object
+  };
+
+  // remove empty password so backend doesn’t overwrite
+  if (!payload.password) {
+    delete payload.password;
+  }
+
+  this.userService.updateUser(this.userId, payload).subscribe({
+    next: () => {
+      console.log('User updated');
+      this.router.navigate(['/admin/users']);
+    },
+    error: (err) => console.error('Error updating user:', err)
+  });
+}
+
 
   cancel(): void {
     this.router.navigate(['/admin/users']);

@@ -36,11 +36,11 @@ export class EventOwnerGuestsComponent {
     });
   }
   resendInvite(g: EditableInvited) {
-  this.store.resendInvite(g.id.email).subscribe({
-    next: () => this.store.error$.next(`Invitation re-sent to ${g.id.email}`),
-    error: (e) => this.store.error$.next(e?.error?.message || 'Failed to resend invite')
-  });
-}
+    this.store.resendInvite(g.id.email).subscribe({
+      next: () => this.store.error$.next(`Invitation re-sent to ${g.id.email}`),
+      error: (e) => this.store.error$.next(e?.error?.message || 'Failed to resend invite')
+    });
+  }
 
   addBulk() {
     if (!this.bulkText.trim()) return;

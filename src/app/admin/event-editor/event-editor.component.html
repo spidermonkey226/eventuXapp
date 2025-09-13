@@ -54,8 +54,8 @@
 
       <label>Category
         <select formControlName="eventCatgory">
-          <option *ngFor="let c of categories" [value]="c">{{ c }}</option>
-        </select>
+  <option *ngFor="let c of categories" [value]="c.value">{{ c.label }}</option>
+</select>
       </label>
 
       <label>Date

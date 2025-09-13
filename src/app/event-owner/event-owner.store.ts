@@ -105,8 +105,8 @@ export class EventOwnerStore {
     );
   }
   resendInvite(email: string) {
-  return this.invitedService.resend(this.eventId, email);
-}
+    return this.invitedService.resend(this.eventId, email);
+  }
 
   // ---- files api (moved) ----
   upload(files: File[]) {

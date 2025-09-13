@@ -23,13 +23,13 @@ export class EventEditorComponent implements OnInit {
   searchTerm = '';
 
   categories = [
-    'Weddings',
-    'Birthdays',
-    'Anniversaries',
-    'Business Conferences',
-    'Meetings',
-    'Family Gatherings'
-  ];
+  { value: 'WEDDINGS', label: 'Weddings' },
+  { value: 'BIRTHDAYS', label: 'Birthdays' },
+  { value: 'ANNIVERSARIES', label: 'Anniversaries' },
+  { value: 'BUSINESS_CONFERENCES', label: 'Business Conferences' },
+  { value: 'MEETINGS', label: 'Meetings' },
+  { value: 'FAMILY_GATHERINGS', label: 'Family Gatherings' }
+];
 
   constructor(
     private fb: FormBuilder,
@@ -45,7 +45,8 @@ export class EventEditorComponent implements OnInit {
       this.eventId = Number(idParam);
       this.setupForm();
       this.loadEvent(this.eventId);
-    } else {
+    }
+ else {
       this.isEditMode = false;
       this.loadEvents();
     }
@@ -100,6 +101,7 @@ export class EventEditorComponent implements OnInit {
       eventCatgory: ['', Validators.required],
       eventDate: ['', Validators.required],
       expectedPeople: [0, [Validators.required, Validators.min(1)]],
+
       comments: [''],
       address: this.fb.group({
         streetName: [''],
@@ -117,32 +119,80 @@ export class EventEditorComponent implements OnInit {
   }
 
   loadEvent(id: number): void {
-    this.loading = true;
-    this.eventService.getById(id).subscribe({
-      next: (event: EventDetail) => {
-        this.form.patchValue(event);
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Error loading event:', err);
-        this.loading = false;
-      }
-    });
+  this.loading = true;
+  this.eventService.getById(id).subscribe({
+    next: (event: EventDetail) => {
+      this.form.patchValue({
+        eventName: event.eventName || '',
+        eventCatgory: event.eventCatgory || '',
+        eventDate: event.eventDate || '',
+        expectedPeople: event.expectedPeople || 0,
+        comments: event.comments || '',
+        address: {
+          streetName: event.address?.streetName || '',
+          streetNumber: event.address?.streetNumber || '',
+          postCode: event.address?.postCode || '',
+          city: event.address?.city || ''
+        },
+        host: {
+          email: event.host?.email || ''
+        },
+        manager: {
+          email: event.manager?.email || ''
+        }
+      });
+
+      console.log('Form patched:', this.form.value);
+      console.log('Valid?', this.form.valid);
+      this.loading = false;
+    },
+    error: (err) => {
+      console.error('Error loading event:', err);
+      this.loading = false;
+    }
+  });
+}
+
+
+save(): void {
+  console.log('Save button clicked');  // 👈 check if it fires
+
+  if (this.form.invalid || !this.eventId) {
+    console.log('Form invalid or eventId missing', this.form.value, this.eventId);
+    this.form.markAllAsTouched();
+    return;
   }
 
-  save(): void {
-    if (this.form.invalid || !this.eventId) {
-      this.form.markAllAsTouched();
-      return;
-    }
-    this.eventService.update(this.eventId, this.form.value).subscribe({
-      next: () => {
-        console.log('Event updated');
-        this.router.navigate(['/admin/events']);
-      },
-      error: (err) => console.error('Error updating event:', err)
-    });
-  }
+  console.log('Form is valid, building payload...');
+  const raw = this.form.value;
+
+  const payload = {
+    eventName: raw.eventName,
+    eventCategory: raw.eventCatgory,
+    date: raw.eventDate,
+    people: raw.expectedPeople,
+    comments: raw.comments,
+    streetName: raw.address.streetName,
+    streetNumber: raw.address.streetNumber,
+    postCode: raw.address.postCode,
+    city: raw.address.city,
+    email: raw.host.email,
+    hasManager: !!raw.manager?.email,
+    managerEmail: raw.manager?.email || null
+  };
+
+  console.log('Payload:', payload);
+
+  this.eventService.update(this.eventId!, payload).subscribe({
+    next: () => {
+      console.log('Event updated');
+      this.router.navigate(['/admin/events']);
+    },
+    error: (err) => console.error('Error updating event:', err)
+  });
+}
+
+
 
   cancel(): void {
     this.router.navigate(['/admin/events']);

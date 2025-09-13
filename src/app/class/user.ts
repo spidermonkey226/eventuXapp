@@ -16,7 +16,7 @@ export class User {
   email: string;
   phone: string;
   password: string;
-  permission: Permision;
+  permision: Permision;
   date: Date;
 
   subscriptionLevel: SubscriptionLevel;
@@ -30,7 +30,7 @@ export class User {
     email: string,
     phone: string,
     password: string,
-    permission: Permision,
+    permision: Permision,
     date: Date,
     subscriptionLevel: SubscriptionLevel = SubscriptionLevel.Free,
     subscriptionStart?: Date,
@@ -42,7 +42,7 @@ export class User {
     this.email = email;
     this.phone = phone;
     this.password = password;
-    this.permission = permission;
+    this.permision = permision;
     this.date = date;
     this.subscriptionLevel = subscriptionLevel;
     this.subscriptionStart = subscriptionStart;

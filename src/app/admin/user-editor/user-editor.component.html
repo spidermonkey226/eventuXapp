@@ -31,7 +31,7 @@
           <td>{{ user.lastName }}</td>
           <td>{{ user.email }}</td>
           <td>{{ user.phone }}</td>
-          <td>{{ user.permission }}</td>
+          <td>{{ user.permision.permisionName }}</td>
           <td>{{ user.date | date }}</td>
           <td>
             <button (click)="editUser(user.idUser)">Edit</button>
@@ -71,10 +71,8 @@
       </label>
 
       <label>Permission
-        <select formControlName="permission">
-          <option *ngFor="let perm of permissions" [value]="perm.id">
-            {{ perm.label }}
-          </option>
+        <select formControlName="permision">
+          <option *ngFor="let perm of permissions" [value]="perm.id">{{ perm.label }}</option>
         </select>
       </label>
 
