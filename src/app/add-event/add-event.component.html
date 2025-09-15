@@ -71,7 +71,9 @@
           <i class="bx bx-buildings"></i>
           <select class="input" required name="city" [(ngModel)]="form.city" #city="ngModel">
             <option value="" disabled>Select a city</option>
-            <option *ngFor="let c of cities" [value]="c">{{ c }}</option>
+            <option *ngFor="let c of cities" [value]="c.key">{{ c.label }}</option>
+
+
           </select>
         </div>
         <small *ngIf="(submitted || city.touched) && city.invalid" class="error">
@@ -105,14 +107,16 @@
       Please choose a date (today or later).
     </small>
 
-    <!-- People (positive) -->
+    <!-- People (positive, with subscription limit) -->
     <div class="controls">
       <i class="bx bx-male-female"></i>
       <input type="number" class="input" placeholder="People"
-             required min="1" name="people" [(ngModel)]="form.people" #people="ngModel" />
+             required min="1" [max]="maxPeople || null"
+             name="people" [(ngModel)]="form.people" #people="ngModel" />
     </div>
     <small *ngIf="(submitted || people.touched) && people.invalid" class="error">
-      People must be at least 1.
+      <span *ngIf="people.errors?.['required']">People must be at least 1.</span>
+      <span *ngIf="people.errors?.['max']">Your subscription only allows up to {{ maxPeople }} people per event.</span>
     </small>
 
     <!-- Category -->

@@ -13,6 +13,7 @@ import { ActivatedRoute } from '@angular/router';
 
 import { PaymentService } from '../services/payment.service';
 import { UserService } from '../services/user.service';
+import { SubscriptionLevel } from '../class/user';
 
 @Component({
   selector: 'app-payment',
@@ -210,15 +211,39 @@ export class PaymentComponent implements OnInit {
     };
 
     this.paymentService.charge(payload).subscribe({
-      next: () => {
-        this.successMsg = 'Payment successful 🎉 Subscription activated.';
-        this.errorMsg = '';
-        this.userService.getMe().subscribe({ next: () => {}, error: () => {} });
-      },
-      error: (err) => {
-        this.successMsg = '';
-        this.errorMsg = err?.error?.message || 'Payment failed. Your subscription was not changed.';
+    next: () => {
+      const start = new Date();
+      const end = new Date();
+      end.setDate(start.getDate() + 30); // always 30 days
+
+      // Map planId -> SubscriptionLevel
+      let level: SubscriptionLevel;
+      switch (this.planId) {
+        case 1: level = SubscriptionLevel.Basic; break;
+        case 2: level = SubscriptionLevel.Standard; break;
+        case 3: level = SubscriptionLevel.Pro; break;
+        case 4: level = SubscriptionLevel.Ultimate; break;
+        default: level = SubscriptionLevel.Free;
       }
-    });
+
+      // Example: replace `1` with current user id (or get from backend `/me`)
+      this.userService.setSubscription(1, level, start, end).subscribe({
+        next: () => {
+          this.successMsg = 'Payment successful 🎉 Subscription activated.';
+          this.errorMsg = '';
+          // refresh current user info
+          this.userService.getMe().subscribe({ next: (u) => console.log('Updated user', u) });
+        },
+        error: (err) => {
+          this.errorMsg = 'Payment succeeded but subscription update failed.';
+          console.error(err);
+        }
+      });
+    },
+    error: (err) => {
+      this.successMsg = '';
+      this.errorMsg = err?.error?.message || 'Payment failed. Your subscription was not changed.';
+    }
+  });
   }
 }

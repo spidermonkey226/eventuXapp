@@ -114,6 +114,9 @@ export class EventService {
     form
   );
 }
+getCities(): Observable<{ key: string, label: string }[]> {
+  return this.http.get<{ key: string, label: string }[]>(`${API}/cities`);
+}
 
   deleteFile(eventId: number, fileId: number) {
   return this.http.delete<void>(`${API}/events/${eventId}/files/${fileId}`);

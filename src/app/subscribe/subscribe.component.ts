@@ -56,27 +56,52 @@ export class SubscribeComponent implements OnInit {
   }
 
   private defaultWindowFor(plan: Subscription): { start: Date; end: Date | null } {
-    const start = new Date();
-    if (plan.name === 'ULTIMATE') {
-      return { start, end: null };
-    }
-    const end = new Date(start);
-    end.setDate(end.getDate() + 30);
+  const start = new Date();
+  const end = new Date(start);
+
+  if (plan.name === 'ULTIMATE') {
+    end.setDate(end.getDate() + 30); 
+    return { start, end }; 
+  }
+    end.setDate(end.getDate() + 30); // 30 days
     return { start, end };
   }
 
   selectPlan(plan: Subscription): void {
-    this.selecting = plan;
-    this.successMsg = '';
-    this.errorMsg = '';
-  }
+  this.selecting = plan;
+  this.successMsg = '';
+  this.errorMsg = '';
+}
 
   confirm(): void {
   if (!this.selecting) return;
   const selectedPlan = this.selecting; // keep for query param
   this.successMsg = '';
   this.errorMsg = '';
-
+  if (selectedPlan.name === 'FREE') {
+    // 👉 directly call backend to set free, no payment
+    const start = new Date();
+    this.userService.setSubscription(
+      this.currentUserId,
+      SubscriptionLevel.Free,
+      start,
+      null
+    ).subscribe({
+      next: () => {
+        this.successMsg = 'Switched to FREE plan ✅';
+        if (this.currentUser) {
+          this.currentUser.subscriptionLevel = SubscriptionLevel.Free;
+          this.currentUser.subscriptionStart = start;
+          this.currentUser.subscriptionEnd = undefined;
+        }
+        this.selecting = null; // close confirm bar
+      },
+      error: () => {
+        this.errorMsg = 'Failed to switch to Free plan.';
+      }
+    });
+    return;
+  }
   // Only navigate to payment. Do NOT update subscription here.
   this.router.navigate(['/payment'], { queryParams: { planId: selectedPlan.id } });
 }

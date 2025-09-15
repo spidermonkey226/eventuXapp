@@ -13,6 +13,12 @@ h1 {
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 16px;
 }
+.price {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2a7ae2;
+  margin-left: 10px;
+}
 
 .card {
   border: 1px solid #e5e7eb;

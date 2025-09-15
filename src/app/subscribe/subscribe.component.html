@@ -24,6 +24,7 @@
     <div class="card" *ngFor="let p of plans">
       <div class="card-header">
         <h2>{{ p.name }}</h2>
+        <span class="price">\${{ p.price }}</span>
         <span class="badge" *ngIf="p.name === 'STANDARD'">Most popular</span>
         <span class="badge accent" *ngIf="p.name === 'ULTIMATE'">Best value</span>
       </div>
@@ -67,7 +68,12 @@
   <div>
     <strong>Confirm {{ s.name }}</strong>
     <div class="sub">
-      This will start immediately{{ s.name !== 'ULTIMATE' ? ' for 30 days' : '' }}.
+      <ng-container *ngIf="s.name === 'FREE'">
+        Switch back to Free plan (no expiry).
+      </ng-container>
+      <ng-container *ngIf="s.name !== 'FREE'">
+        This will start immediately for 30 days.
+      </ng-container>
     </div>
   </div>
   <div class="actions">

@@ -1,4 +1,4 @@
-// src/app/add-event/add-event.component.ts
+
 import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -20,7 +20,9 @@ export class AddEventComponent implements OnInit {
 
   // These values must match your backend enums exactly
   categories = ['CONFERENCE', 'WORKSHOP', 'WEBINAR', 'SEMINAR', 'FESTIVAL']; // EventCategory
-  cities = ['TEL AVIV', 'JERUSALEM', 'HAIFA']; // City
+  cities: { key: string, label: string }[] = [];
+
+
 
   submitted = false;
   submitting = false;
@@ -52,21 +54,38 @@ export class AddEventComponent implements OnInit {
   };
   emailPattern = '^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$';  // simple: has @ and a dot before end
   phonePattern = '^\\d{10}$';                          // exactly 10 digits
-  ngOnInit(): void {
-  this.auth.isLoggedIn$.subscribe(isIn => {
-    if (!isIn) {
-      alert('You must sign in to add an event.');
-      this.router.navigate(['/signin'], { queryParams: { redirect: '/addevent' } });
-    }
-  });
 
-  this.auth.user$.subscribe(u => {
-    if (!u) return;
-    this.form.email = u.email ?? '';
-    this.form.phone = u.phone ?? '';
-    if (this.form.hasManager) this.copyHostToManager();
+  // 👉 added: hold the max invites allowed for this user
+  maxPeople: number | null = null;
+
+  ngOnInit(): void {
+    this.events.getCities().subscribe(cities => {
+    this.cities = cities;
   });
-}
+    this.auth.isLoggedIn$.subscribe(isIn => {
+      if (!isIn) {
+        alert('You must sign in to add an event.');
+        this.router.navigate(['/signin'], { queryParams: { redirect: '/addevent' } });
+      }
+    });
+
+    this.auth.user$.subscribe(u => {
+      if (!u) return;
+      this.form.email = u.email ?? '';
+      this.form.phone = u.phone ?? '';
+
+      // 👉 ADDED: set maxPeople based on subscription level
+      switch (u.subscriptionLevel) {   // check actual property name in your user object
+        case 'Free': this.maxPeople = 5; break;
+        case 'Basic': this.maxPeople = 20; break;
+        case 'Standard': this.maxPeople = 50; break;
+        case 'Pro': this.maxPeople = 200; break;
+        case 'Ultimate': this.maxPeople = null; break; // unlimited
+      }
+
+      if (this.form.hasManager) this.copyHostToManager();
+    });
+  }
 
   onHasManagerToggle() {
     if (this.form.hasManager) {
@@ -79,8 +98,6 @@ export class AddEventComponent implements OnInit {
   }
 
   private copyHostToManager() {
-    // Optional: if you want a default name, combine first/last when available
-    // this.form.managerName = `${u.firstName ?? ''} ${u.lastName ?? ''}`.trim();
     this.form.managerEmail = this.form.email;
     this.form.managerPhone = this.form.phone;
   }
@@ -98,8 +115,13 @@ export class AddEventComponent implements OnInit {
       this.topError = 'Number of people must be at least 1.';
       return;
     }
+    // 👉 ADDED: check against maxPeople before sending to backend
+    if (this.maxPeople !== null && this.form.people > this.maxPeople) {
+      this.topError = `Your subscription only allows up to ${this.maxPeople} people per event.`;
+      return;
+    }
+
     if (this.form.hasManager) {
-      // ensure manager fields pass basic patterns
       if (!new RegExp(this.emailPattern).test(this.form.managerEmail || '')) {
         this.topError = 'Manager email is invalid.';
         return;
@@ -111,11 +133,9 @@ export class AddEventComponent implements OnInit {
     }
 
     if (f.invalid) return;
-
     if (this.submitting || !f.valid) return;
     this.submitting = true;
 
-    // Minimal client checks
     if (!this.form.eventCategory) { alert('Please choose an event category.'); this.submitting = false; return; }
     if (!this.form.city) { alert('Please choose a city.'); this.submitting = false; return; }
 
@@ -124,11 +144,11 @@ export class AddEventComponent implements OnInit {
       next: () => {
         this.successMsg = 'Event created successfully!';
         this.submitting = false;
-        this.router.navigateByUrl('/user-events'); // uncomment if you want redirect
+        this.router.navigateByUrl('/user-events');
 
         this.auth.refreshUser().subscribe({
           next: () => this.router.navigateByUrl('/user-events'),
-          error: () => this.router.navigateByUrl('/user-events') // still navigate if refresh fails
+          error: () => this.router.navigateByUrl('/user-events')
         });
       },
       error: (err) => {
